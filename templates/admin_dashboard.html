@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - SecureApp</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_style.css') }}"/>
+</head>
+<body>
+  <aside class="sidebar">
+    <h2>SecureApp</h2>
+    <nav>
+      <a href="{{ url_for('dashboard') }}" class="nav-link">🏠 Dashboard</a>
+      <a href="#" class="nav-link active">👑 Admin Panel</a>
+      <a href="{{ url_for('logout') }}" class="nav-link">🚪 Logout</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <h1>Welcome, <span class="highlight">{{ user['username'] }}</span></h1>
+      <button id="darkModeToggle" class="dark-mode-toggle">🌙 Dark Mode</button>
+    </div>
+
+    <section class="admin-section">
+      <div class="card">
+        <h2>Admin Tools</h2>
+        <p>Manage user accounts, assign roles, and control access levels.</p>
+      </div>
+
+      <div class="card">
+        <h3>Registered Users</h3>
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Last Login</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.username }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.role|capitalize }}</td>
+              <td>{{ u.last_login or 'N/A' }}</td>
+              <td>{{ 'Active' if u.active else 'Disabled' }}</td>
+              <td>
+                <a href="{{ url_for('edit_user', user_id=u.id) }}" class="action-btn edit">Edit</a>
+                <a href="{{ url_for('toggle_user_status', user_id=u.id) }}" class="action-btn toggle">
+                  {{ 'Disable' if u.active else 'Enable' }}
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const toggleBtn = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    function setDarkMode(enabled) {
+      if (enabled) {
+        body.classList.add('dark');
+        toggleBtn.textContent = '☀️ Light Mode';
+      } else {
+        body.classList.remove('dark');
+        toggleBtn.textContent = '🌙 Dark Mode';
+      }
+      localStorage.setItem('darkMode', enabled);
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      setDarkMode(!body.classList.contains('dark'));
+    });
+
+    const saved = localStorage.getItem('darkMode');
+    if (saved === 'true') setDarkMode(true);
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+2025-06-09 14:42:11,081 [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-06-09 14:42:11,082 [33mPress CTRL+C to quit[0m
+2025-06-09 14:42:11,099  * Restarting with stat
+2025-06-09 14:42:11,648  * Debugger is active!
+2025-06-09 14:42:11,656  * Debugger PIN: 143-009-453
+2025-06-09 14:42:29,708 127.0.0.1 - - [09/Jun/2025 14:42:29] "[32mGET / HTTP/1.1[0m" 302 -
+2025-06-09 14:42:29,739 127.0.0.1 - - [09/Jun/2025 14:42:29] "GET /register HTTP/1.1" 200 -
+2025-06-09 14:42:29,754 127.0.0.1 - - [09/Jun/2025 14:42:29] "[33mGET /static/scripts.js HTTP/1.1[0m" 404 -
+2025-06-09 14:42:29,755 127.0.0.1 - - [09/Jun/2025 14:42:29] "[33mGET /static/style.css HTTP/1.1[0m" 404 -
+2025-06-09 14:43:46,410  * Detected change in 'C:\\Users\\Nitro\\secure_registration\\app.py', reloading
+2025-06-09 14:43:46,488  * Restarting with stat
+2025-06-09 14:43:50,399  * Restarting with stat
+2025-06-09 14:45:34,275  * Restarting with stat

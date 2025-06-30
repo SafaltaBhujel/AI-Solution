@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RBAC - Role Permissions</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
+      background: #fdfdfd;
+    }
+    h2 {
+      text-align: center;
+      color: #444;
+    }
+    table {
+      width: 80%;
+      margin: 2rem auto;
+      border-collapse: collapse;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      background: white;
+    }
+    th, td {
+      padding: 1rem;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #ffe6f0;
+      color: #444;
+    }
+    td {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h2>Role-Based Access Control</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>Description</th>
+        <th>Permissions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for role in roles %}
+      <tr>
+        <td>{{ role.name }}</td>
+        <td>{{ descriptions.get(role.name, "No description") }}</td>
+        <td>{{ role.permissions.replace(',', ', ') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>
