@@ -13,27 +13,31 @@ import time
 from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_bcrypt import Bcrypt
+from dotenv import load_dotenv
 from flask_mail import Mail, Message
 from authlib.integrations.flask_client import OAuth
 from urllib.parse import urlparse, urljoin
 from datetime import timedelta, datetime
-from dotenv import load_dotenv
 from flask_talisman import Talisman
-from functools import wraps
 from werkzeug.utils import secure_filename
-from flask import request, flash, redirect, url_for, session, render_template
 from flask_login import login_required
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
+from datetime import datetime
+
 
 # Load .env file
 load_dotenv()
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'  
+
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your_default_secret')
 app.permanent_session_lifetime = timedelta(minutes=15)
 
 # Flask-Talisman for security headers
-Talisman(app, content_security_policy=None)  # Disable CSP or customize as needed
-
+Talisman(app, content_security_policy=None) 
 # Email setup
 app.config.update(
     MAIL_SERVER='smtp.gmail.com',
@@ -70,6 +74,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 SITE_KEY = os.getenv('RECAPTCHA_SITE_KEY')
 SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY')
 DB_FILE = 'users.db'
+# SQLite Database
+DB_FILE = 'users.db'
 def get_db():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
@@ -94,6 +100,7 @@ def init_db():
             verification_token_expiry TIMESTAMP,
             failed_login_attempts INTEGER DEFAULT 0,
             lockout_time TIMESTAMP,
+            last_login DATETIME,
             role TEXT DEFAULT 'user',
             is_enabled INTEGER DEFAULT 1,
             profile_image TEXT DEFAULT NULL
@@ -124,7 +131,71 @@ def init_db():
 
 init_db()
 
-# ------------------ Helpers ------------------
+
+def get_all_users():
+    db = get_db()
+    return db.execute('SELECT * FROM users ORDER BY id').fetchall()
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('role') != 'admin':
+            flash("Access denied.", "danger")
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def permission_required(permission):
+    def wrapper(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if session.get('role') != 'admin':
+                flash("Permission denied.", "danger")
+                return redirect(url_for('dashboard'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return wrapper
+
+
+class User(UserMixin):
+    def __init__(self, user_row): 
+        self.id = user_row['id']
+        self.username = user_row['username']
+        self.email = user_row['email']
+        self.role = user_row['role']
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    db = get_db()
+    row = db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    return User(row) if row else None
+
+
+
+@app.route('/admin_dashboard')
+@admin_required
+def admin_dashboard():
+    db = get_db()
+    user = None
+    if 'user' in session:
+        user = db.execute('SELECT * FROM users WHERE username = ?', (session['user'],)).fetchone()
+    return render_template('admin_dashboard.html', user=user)
+
+@app.route('/admin/manage_users')
+@admin_required
+@permission_required('manage_users')
+def manage_users():
+    users = get_all_users()
+    return render_template('admin/users.html', users=users)
+
+@app.route('/admin/manage_roles')
+@admin_required
+@permission_required('change_roles')
+def manage_roles():
+    db = get_db()
+    roles = db.execute('SELECT * FROM roles').fetchall()
+    return render_template('admin_roles.html', roles=roles)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -162,7 +233,6 @@ def check_password_reuse(db, user_id, new_password):
             return True
     return False
 
-# ------------------ Decorators ------------------
 
 def permission_required(permission):
     def decorator(f):
@@ -307,7 +377,7 @@ def dashboard():
 
     session['role'] = user['role']
 
-    # ✅ Handle profile image upload on POST
+    # Handle profile image upload on POST
     if request.method == 'POST':
         if 'profile_image' in request.files:
             file = request.files['profile_image']
@@ -329,7 +399,7 @@ def dashboard():
             else:
                 flash("No file selected.", "error")
 
-    # ✅ Set profile image to show (default if none)
+    # Set profile image to show (default if none)
     profile_image = user['profile_image'] if user['profile_image'] else 'default.png'
 
     last_login_row = db.execute(
@@ -345,17 +415,6 @@ def dashboard():
                            last_login=last_login,
                            role=user['role'])
 
-@app.route('/admin/manage_users')
-@admin_required
-@permission_required('manage_users')
-@login_required
-def manage_users():
-    if session.get('role') != 'admin':
-        flash("Access denied.", "danger")
-        return redirect(url_for('dashboard'))
-    # logic to render admin page
-    users = get_all_users()  # Your function to get user data
-    return render_template('admin/manage_users.html', users=users)
 
 @app.route('/admin/toggle_user/<int:user_id>')
 @admin_required
@@ -375,7 +434,7 @@ def toggle_user(user_id):
 
 
 @app.route('/roles')
-@admin_required  # Optional: restrict this page to admins only
+@admin_required 
 def view_roles():
     db = get_db()
     roles = db.execute('SELECT * FROM roles ORDER BY id DESC').fetchall()
@@ -447,7 +506,7 @@ def register():
 
     return render_template('register.html', site_key=SITE_KEY)
 
-@app.route('/disable_2fa', methods=['POST'])
+@app.route('/enable_2fa', methods=['POST'])
 def disable_2fa():
     if 'user' not in session:
         return redirect(url_for('login'))
@@ -458,6 +517,40 @@ def disable_2fa():
         log_event(session['user'], '2fa_disabled')
     flash('2FA disabled.', 'info')
     return redirect(url_for('dashboard'))
+
+
+
+@app.route('/verify_2fa', methods=['POST'])
+def verify_2fa():
+    if 'user' not in session and 'tmp_user' not in session:
+        flash("Session expired or invalid.", "danger")
+        return redirect(url_for('login'))
+
+    username = session.get('user') or session.get('tmp_user')
+    code = request.form.get('code')
+
+    db = get_db()
+    user = db.execute('SELECT otp_secret FROM users WHERE username = ?', (username,)).fetchone()
+
+    if not user:
+        flash("User not found.", "danger")
+        return redirect(url_for('login'))
+
+    totp = pyotp.TOTP(user['otp_secret'])
+
+    if totp.verify(code):
+        flash("2FA setup successful!", "success")
+        log_event(username, '2fa_verified')
+
+        if 'tmp_user' in session:
+            session.pop('tmp_user')
+            session['user'] = username
+            return redirect(url_for('dashboard'))
+
+        return redirect(url_for('dashboard'))
+    else:
+        flash("Invalid 2FA code. Please try again.", "danger")
+        return redirect(url_for('dashboard'))
 
 @app.route('/verify_email/<token>')
 def verify_email(token):
@@ -485,12 +578,8 @@ def login():
             return redirect(url_for('login'))
 
         db = get_db()
-        # NOTE: Remove role from query condition here:
-        user = db.execute(
-            "SELECT * FROM users WHERE username = ?", (username,)
-        ).fetchone()
+        user = db.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
 
-        # Debug print (optional, can remove)
         print(f"Login attempt: username={username}")
         print(f"User found: {user}")
         if user:
@@ -525,16 +614,18 @@ def login():
                     flash('Password expired. Please change it.', 'warning')
                     return redirect(url_for('change_password'))
 
-                # Reset failed attempts and login
-                db.execute('UPDATE users SET failed_login_attempts = 0, lockout_time = NULL WHERE username = ?', (username,))
+                # Reset failed attempts and update last_login
+                db.execute('UPDATE users SET failed_login_attempts = 0, lockout_time = NULL, last_login = ? WHERE username = ?',
+                (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), username)
+                )
                 db.commit()
 
                 session['user'] = username
-                session['role'] = user['role']  # Store role
+                session['role'] = user['role']
+                login_user(User(user))  # ✅ Flask-Login session
 
                 log_event(username, 'login_success')
 
-                # Redirect based on role
                 if user['role'] == 'admin':
                     return redirect(url_for('admin_dashboard'))
                 else:
@@ -562,15 +653,13 @@ def login():
             flash('Invalid credentials.', 'danger')
             return redirect(url_for('login'))
 
-    # GET request: Render login page without role select
     return render_template('login.html', site_key=SITE_KEY)
 
 
-# --------- UPDATED FORGOT PASSWORD (accepts username or email) ------------
 @app.route('/forgot_password', methods=['GET','POST'])
 def forgot_password():
     if request.method == 'POST':
-        identifier = request.form['identifier'].strip()  # could be username or email
+        identifier = request.form['identifier'].strip() 
         db = get_db()
         user = None
 
@@ -624,7 +713,6 @@ def reset_password(token):
 
         new_hash = bcrypt.generate_password_hash(new_password).decode()
 
-        # Update passwords and clear reset tokens
         with get_db() as db2:
             old_hash = user['password_hash']
             prev_hash = user['previous_password_hash']
@@ -717,7 +805,7 @@ def twofa():
             log_event(username, 'login_2fa_success')
             flash('Login successful ✅', 'success')
 
-            # ✅ Role-based final redirection
+            # Role-based final redirection
             if next_page == 'admin':
                 return redirect(url_for('manage_users'))
             else:
@@ -747,11 +835,16 @@ def admin_required(f):
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     user = session.get('user')
-    session.clear()
+
+    logout_user()  # ✅ Flask-Login logout
+    session.clear()  # Optional but good for clearing custom session data like 'role'
+
     if user:
         log_event(user, 'logout')
+
     flash('Logged out.', 'info')
     return redirect(url_for('login'))
+
 
 @app.route('/login/google')
 def login_google():
@@ -791,14 +884,13 @@ def google_callback():
         flash('Please verify your email sent to your Google account before logging in.', 'info')
         return redirect(url_for('login'))
 
-    # ✅ FIXED: Now inside the function with proper indentation
     session['user'] = username
     session['role'] = user['role']  # <- ADD THIS LINE
 
     log_event(username, 'login_google_success')
-    flash(f'Logged in as {username} via Google ✅', 'success')
+    flash(f'Logged in as {username} via Google ', 'success')
 
-    # ✅ Redirect based on role
+    # Redirect based on role
     if user['role'] == 'admin':
         return redirect(url_for('admin_dashboard'))
     else:
@@ -809,6 +901,11 @@ def print_custom_url():
     print("\n * Running on https://myapp.local:5000/\n")
 
 threading.Thread(target=print_custom_url).start()
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    app.debug = True  
+    app.run(
+        host='127.0.0.1',
+        port=5000,
+        ssl_context=('certs/myapp.local+2.pem', 'certs/myapp.local+2-key.pem')
+    )
+

@@ -1,20 +1,17 @@
-==================================================
  SECURE FLASK REGISTRATION & LOGIN SYSTEM
-==================================================
 
 👤 Developer: Safalta Bhujel  
 📚 University of Sunderland – CET324: Advanced CyberSecurity  
 📅 Academic Year: 2024/25  
 
---------------------------------------------------
 🔐 OVERVIEW
---------------------------------------------------
-This project is a complete, production-ready **secure user authentication system** built using Flask.  
+
+This project is a complete, production-ready **secure user authentication system built using Flask.  
 It includes modern security features, intuitive UI design, and best practices for user account management.
 
---------------------------------------------------
+
 📁 PROJECT STRUCTURE
---------------------------------------------------
+
 
 secure_registration/
 ├── static/
@@ -35,9 +32,9 @@ secure_registration/
 ├── security.log            → Audit trail of user actions
 └── V3 Captcha/             → Captcha test/config folder (if using v3)
 
---------------------------------------------------
+
 ✨ KEY FEATURES
---------------------------------------------------
+
 
 ✅ reCAPTCHA v3 validation (Google)  
 ✅ Email verification before login allowed  
@@ -53,42 +50,57 @@ secure_registration/
 ✅ Mobile responsive UI (baby pink & white theme)  
 ✅ SQLite backend (users.db)  
 
---------------------------------------------------
-⚙️ SETUP INSTRUCTIONS
---------------------------------------------------
 
-1. 🐍 Create Virtual Environment
+ROLE-BASED ACCESS CONTROL (RBAC)
+
+Users are assigned roles (e.g., admin, user) during or after registration
+
+Admins can manage users, view logs, and access protected routes
+
+Regular users have limited access to their own dashboard and profile
+
+Role checks are enforced on protected routes
+
+RBAC is managed in the database and checked during session handling
+
+
+
+
+⚙️ SETUP INSTRUCTIONS
+
+
+1.  Create Virtual Environment
    > python -m venv venv  
    > venv\Scripts\activate   (Windows)  
    > source venv/bin/activate (Linux/macOS)
 
-2. 📦 Install Dependencies
+2.  Install Dependencies
    > pip install -r requirements.txt
 
-3. 🛠️ Create .env File (based on .env.example)
+3.  Create .env File (based on .env.example)
 
 
 4. ▶️ Run the Flask App
    > python app.py  
    Access: http://127.0.0.1:5000/
 
---------------------------------------------------
+
 📌 OPTIONAL FILES
---------------------------------------------------
+
 - `generate_secret.py`: Tool to generate test OTP secrets.
 - `security.log`: Contains readable logs for major user events.
 - `site.db`: Unused unless expanded for separate data needs.
 
---------------------------------------------------
+
 📨 EMAIL NOTES
---------------------------------------------------
+
 - Gmail SMTP is used (`smtp.gmail.com`, port 587)
 - Use an **App Password** if 2FA is enabled on Gmail
 - Ensure `Less secure app access` is allowed if using regular password (not recommended)
 
---------------------------------------------------
+
 🧪 TESTING
---------------------------------------------------
+
 - Try registering with a new user.
 - Check your email for OTP and verification link.
 - Try invalid login attempts to trigger account lockout.
@@ -96,22 +108,22 @@ secure_registration/
 - Check password expiry/reset scenarios.
 - Google OAuth works for new or existing Gmail accounts.
 
---------------------------------------------------
+
 📋 AUDIT LOGS
---------------------------------------------------
+
 - All user actions like login, logout, reset, 2FA failures, and email verification are logged in `security.log` or SQLite `audit_logs` table.
 
---------------------------------------------------
+
 📱 UI HIGHLIGHTS
---------------------------------------------------
+
 🎨 Theme: Soft Baby Pink & White  
 💡 Fully mobile responsive  
 ✅ Clean and modern design  
 🚫 Avoids unnecessary purple or dark shades
 
---------------------------------------------------
+
 📦 DEPENDENCIES (requirements.txt)
---------------------------------------------------
+
 - Flask  
 - Flask-Bcrypt  
 - Flask-Mail  
@@ -123,9 +135,9 @@ secure_registration/
 - Authlib  
 - sqlite3 (built-in)
 
---------------------------------------------------
+
 🛡️ SECURITY PRACTICES FOLLOWED
---------------------------------------------------
+
 ✔️ Hashed passwords (bcrypt)  
 ✔️ Email verification before login  
 ✔️ 2FA using email OTP  
@@ -136,9 +148,9 @@ secure_registration/
 ✔️ Password reuse prevention  
 ✔️ Token-based reset/verification with expiry
 
---------------------------------------------------
+
 📝 FINAL NOTES
---------------------------------------------------
+
 - This system is production-level secure.
 - The `users.db` is self-initialized on first run.
 - All templates are self-contained and themed.
