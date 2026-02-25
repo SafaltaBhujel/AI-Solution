@@ -4,15 +4,31 @@
   <meta charset="UTF-8" />
   <title>Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
   <style>
     :root {
-      --main-bg: linear-gradient(135deg, #fce3ec, #e0f7fa);
-      --sidebar-bg: #1e1e2f;
-      --accent: #ff5c8d;
-      --card-bg: #ffffff;
-      --text: #333;
+      --sidebar-bg: #0f172a;
+      --sidebar-accent: #6366f1;
+      --header-gradient: linear-gradient(135deg, #6366f1, #ec4899);
+      --glass-bg: rgba(255, 255, 255, 0.15);
+      --card-bg: rgba(255, 255, 255, 0.6);
+      --text-dark: #111827;
+      --text-light: #6b7280;
+      --blur: blur(12px);
+      --transition: all 0.3s ease;
+    }
+
+    body.dark {
+      --sidebar-bg: #1e293b;
+      --sidebar-accent: #a78bfa;
+      --header-gradient: linear-gradient(135deg, #9333ea, #f43f5e);
+      --glass-bg: rgba(30, 41, 59, 0.7);
+      --card-bg: rgba(30, 41, 59, 0.6);
+      --text-dark: #f1f5f9;
+      --text-light: #94a3b8;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: var(--text-dark);
     }
 
     * {
@@ -23,15 +39,15 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: var(--main-bg);
-      color: var(--text);
       display: flex;
       min-height: 100vh;
-      overflow-x: hidden;
+      background: linear-gradient(135deg, #e0e7ff, #fce7f3);
+      transition: var(--transition);
     }
 
+    /* Sidebar */
     .sidebar {
-      width: 250px;
+      width: 260px;
       background: var(--sidebar-bg);
       color: #fff;
       padding: 2rem 1rem;
@@ -39,147 +55,205 @@
       top: 0;
       bottom: 0;
       left: 0;
-      z-index: 1000;
-      transition: transform 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition);
     }
 
     .sidebar h2 {
-      font-size: 1.5rem;
-      color: var(--accent);
+      font-size: 1.6rem;
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
+      font-weight: 700;
+      color: var(--sidebar-accent);
     }
 
     .sidebar a {
-      color: #ccc;
+      color: #d1d5db;
       text-decoration: none;
       display: flex;
       align-items: center;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
+      padding: 1rem;
+      border-radius: 12px;
       font-weight: 500;
-      margin-bottom: 0.75rem;
-      transition: background 0.2s ease, color 0.2s ease;
+      margin-bottom: 0.8rem;
+      transition: var(--transition);
     }
 
     .sidebar a i {
       margin-right: 12px;
+      font-size: 1.2rem;
     }
 
     .sidebar a:hover {
-      background-color: #2f2f45;
+      background: rgba(99, 102, 241, 0.25);
       color: #fff;
+      transform: translateX(6px);
     }
 
+    /* Main */
     .main-content {
-      margin-left: 250px;
+      margin-left: 260px;
       flex: 1;
       padding: 2rem;
-      transition: margin-left 0.3s ease;
+      transition: var(--transition);
     }
 
+    /* Header */
     .header {
+      background: var(--header-gradient);
+      color: #fff;
+      padding: 2rem;
+      border-radius: 20px;
+      margin-bottom: 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
       flex-wrap: wrap;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      backdrop-filter: var(--blur);
+      animation: fadeIn 0.6s ease-in-out;
     }
 
     .header h1 {
       font-size: 2rem;
-      color: var(--accent);
+      font-weight: 700;
     }
 
     .user-info {
-      font-size: 0.95rem;
-      color: #666;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
     }
 
+    /* Toggle button */
+    .theme-toggle {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: #fff;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: var(--transition);
+    }
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Cards */
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      animation: fadeUp 0.6s ease-in-out;
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: 16px;
+      backdrop-filter: var(--blur);
+      border-radius: 18px;
       padding: 2rem;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       text-align: center;
-      transition: all 0.3s ease;
+      transition: var(--transition);
       position: relative;
       overflow: hidden;
     }
 
-    .card::before {
-      content: '';
-      position: absolute;
-      top: -30%;
-      left: -30%;
-      width: 160%;
-      height: 160%;
-      background: radial-gradient(circle, rgba(255,92,141,0.1), transparent);
-      transform: rotate(45deg);
-    }
-
     .card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+      transform: translateY(-8px) scale(1.03);
+      background: rgba(255, 255, 255, 0.75);
     }
 
     .card i {
-      font-size: 2.5rem;
-      color: var(--accent);
+      font-size: 2.8rem;
+      color: var(--sidebar-accent);
       margin-bottom: 1rem;
     }
 
     .card span a {
       text-decoration: none;
-      color: var(--text);
-      font-size: 1.1rem;
+      color: var(--text-dark);
+      font-size: 1.2rem;
       font-weight: 600;
       display: inline-block;
-      transition: color 0.2s ease;
+      transition: var(--transition);
     }
 
     .card span a:hover {
-      color: var(--accent);
+      color: var(--sidebar-accent);
     }
 
-    /* Toggle Button */
-    .menu-toggle {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 1.8rem;
-      color: var(--accent);
-      cursor: pointer;
+    /* Chart section */
+    .charts {
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .chart {
+      background: var(--card-bg);
+      backdrop-filter: var(--blur);
+      border-radius: 18px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: fadeUp 0.7s ease-in-out;
+    }
+
+    .chart h3 {
       margin-bottom: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    /* Floating Action Button */
+    .fab {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      background: var(--sidebar-accent);
+      color: #fff;
+      font-size: 1.5rem;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: var(--transition);
+    }
+    .fab:hover {
+      transform: rotate(90deg) scale(1.1);
+      background: #ec4899;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
       }
-
       .sidebar.active {
         transform: translateX(0);
       }
-
       .main-content {
         margin-left: 0;
-      }
-
-      .menu-toggle {
-        display: block;
-      }
-
-      .header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
       }
     }
   </style>
@@ -188,20 +262,24 @@
 
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar">
-    <h2>SecureApp</h2>
+    <h2>AI SOLUTIONS</h2>
     <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
-    <a href="{{ url_for('manage_users') }}"><i class="fas fa-users-cog"></i> Manage Users</a>
-    <a href="{{ url_for('manage_roles') }}"><i class="fas fa-user-tag"></i> Manage Roles</a>
-    <a href="{{ url_for('dashboard') }}"><i class="fas fa-chart-line"></i> User Panel</a>
+       <li><a href="{{ url_for('admin_feedback_page') }}">Feedback</a></li>
+
+<a href="{{ url_for('admin_events') }}"><i class="fas fa-calendar-alt"></i> Events</a>
+    <a href="{{ url_for('admin_gallery') }}"><i class="fas fa-image"></i> Gallery</a>
+    <a href="{{ url_for('admin_contact_messages') }}"><i class="fas fa-envelope"></i> Contact Messages</a>
+    <a href="{{ url_for('admin_articles') }}"><i class="fas fa-newspaper"></i> Articles</a>
+    <a href="{{ url_for('admin_case_studies') }}"><i class="fas fa-book"></i> Case Studies</a>
     <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
   </nav>
 
   <!-- Main -->
   <main class="main-content">
     <div class="header">
-      <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
       <h1>Welcome, {{ user['username'] }}</h1>
       <div class="user-info">Role: <strong>{{ user['role'] }}</strong></div>
+      <button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
     </div>
 
     <div class="cards">
@@ -222,12 +300,68 @@
         <span><a href="{{ url_for('logout') }}">Logout</a></span>
       </div>
     </div>
+
+    <!-- Charts -->
+    <div class="charts">
+      <div class="chart">
+        <h3>Users Overview</h3>
+        <canvas id="usersChart"></canvas>
+      </div>
+      <div class="chart">
+        <h3>System Activity</h3>
+        <canvas id="activityChart"></canvas>
+      </div>
+    </div>
   </main>
 
+  <!-- Floating Action Button -->
+  <button class="fab"><i class="fas fa-plus"></i></button>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('active');
+    // Dark mode toggle
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      const icon = document.querySelector('.theme-toggle i');
+      if (document.body.classList.contains('dark')) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+      }
     }
+
+    // Users chart
+    const ctx1 = document.getElementById('usersChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'doughnut',
+      data: {
+        labels: ['Admins', 'Editors', 'Users'],
+        datasets: [{
+          data: [3, 7, 20],
+          backgroundColor: ['#6366f1', '#ec4899', '#fbbf24']
+        }]
+      }
+    });
+
+    // Activity chart
+    const ctx2 = document.getElementById('activityChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Logins',
+          data: [12, 19, 14, 22, 18, 10, 16],
+          borderColor: '#6366f1',
+          backgroundColor: 'rgba(99,102,241,0.2)',
+          fill: true,
+          tension: 0.4
+        }]
+      }
+    });
   </script>
 </body>
 </html>

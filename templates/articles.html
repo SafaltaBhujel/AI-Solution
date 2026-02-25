@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Articles | AI-Solutions</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+/* --- General Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #e7edf5;
+    color: #333;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1,h2,h3,h4 {
+    margin-bottom: 15px;
+}
+
+p {
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
+
+/* --- Navbar --- */
+.navbar {
+    background: #ffffff;
+    padding: 18px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+.nav-links li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    transition: 0.3s;
+    padding: 5px 0;
+}
+.nav-links li a.active,
+.nav-links li a:hover {
+    color: #ff6ec7;
+    border-bottom: 2px solid #ff6ec7;
+}
+.hamburger {
+    display: none;
+    cursor: pointer;
+    font-size: 1.8rem;
+}
+@media(max-width:768px){
+    .nav-links{
+        display:none;
+        flex-direction:column;
+        gap:10px;
+        margin-top:10px;
+    }
+    .nav-links.active{display:flex;}
+    .hamburger{display:block;}
+}
+
+/* --- Hero Section --- */
+.articles-hero { 
+    text-align:center; 
+    padding:120px 20px 80px; 
+    background: linear-gradient(135deg,#6ec1ff,#ff6ec7); 
+    color:#fff; 
+    clip-path: polygon(0 0,100% 0,100% 85%,0 100%);
+}
+.articles-hero h1 { 
+    font-size: 3rem; 
+    font-weight: 700; 
+    margin-bottom: 15px; 
+    text-shadow: 2px 2px 15px rgba(0,0,0,0.3);
+}
+.articles-hero p { 
+    font-size: 1.3rem; 
+    max-width: 700px; 
+    margin: 0 auto; 
+    font-weight: 500; 
+}
+
+/* --- Articles Grid --- */
+.articles-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 60px 20px 100px;
+}
+.article-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+/* --- Article Cards --- */
+.article-card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+    transition: transform 0.4s, box-shadow 0.4s;
+    cursor: pointer;
+}
+.article-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.18);
+}
+.article-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.4s;
+}
+.article-card:hover img { transform: scale(1.05); }
+
+.article-card-content { padding: 25px; }
+.article-card-content .category {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #ff6ec7;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.article-card-content h3 { 
+    font-size: 1.25rem; 
+    margin-bottom: 12px; 
+    color: #222; 
+}
+.article-card-content p { 
+    font-size: 0.95rem; 
+    line-height: 1.6; 
+    margin-bottom: 18px; 
+    color: #555; 
+}
+.article-card-content a {
+    display: inline-block;
+    background: linear-gradient(135deg,#ff6ec7,#6ec1ff);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-weight: 500;
+    transition: background 0.4s, transform 0.3s;
+    text-decoration: none;
+}
+.article-card-content a:hover {
+    background: linear-gradient(135deg,#6ec1ff,#ff6ec7);
+    transform: translateY(-2px);
+}
+
+/* --- Modal --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    padding-top: 120px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: rgba(0,0,0,0.75);
+}
+.modal-content {
+    background: #fff;
+    margin: auto;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 700px;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+    animation: fadeIn 0.5s ease;
+}
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 1.6rem;
+    cursor: pointer;
+    color: #ff6ec7;
+}
+.close-modal:hover { color: #6ec1ff; }
+
+/* --- Footer --- */
+.main-footer {
+    background: #222;
+    color: #fff;
+    text-align: center;
+    padding: 40px 0;
+    font-size: 0.95rem;
+}
+
+/* --- Animations --- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+<div class="container nav-container">
+    <div class="logo"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="AI-Solutions Logo" style="width:39px;"></div>
+    <nav id="nav-menu">
+        <ul class="nav-links">
+            <li><a href="{{ url_for('landing') }}">Home</a></li>
+            <li><a href="{{ url_for('about') }}">About Us</a></li>
+            <li><a href="{{ url_for('solutions') }}">Solutions</a></li>
+            <li><a href="{{ url_for('services') }}">Services</a></li>
+            <li><a href="{{ url_for('case_studies') }}">Case Studies</a></li>
+            <li><a href="{{ url_for('articles') }}" class="active">Articles</a></li>
+            <li><a href="{{ url_for('events') }}">Events</a></li>
+            <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+            <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+            <li><a href="{{ url_for('contact') }}">Contact</a></li>
+        </ul>
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+    </nav>
+</div>
+</header>
+
+<!-- Hero Section -->
+<section class="articles-hero">
+<div class="container">
+<h1>Insights & Articles</h1>
+<p>Explore the latest trends in AI, Automation, Analytics, and Intelligent Business Solutions.</p>
+</div>
+</section>
+
+<!-- Articles Grid -->
+<div class="articles-container">
+<div class="article-grid" id="articleGrid"></div>
+</div>
+
+<!-- Modals -->
+<div id="modalsContainer"></div>
+
+<footer class="main-footer">
+<p>© 2025 AI-Solutions | All Rights Reserved</p>
+</footer>
+
+<script>
+// Navbar toggle
+function toggleMenu(){ document.getElementById('nav-menu').classList.toggle('active'); }
+
+// Articles Data with local images
+const articles = [
+  { title: 'AI in HR – Transforming Employee Experience', category: 'AI', brief: 'Learn how AI is reshaping employee experience.', details: 'Full content: AI is revolutionizing HR by automating repetitive tasks, providing predictive insights on employee performance, and improving engagement metrics across the organization.', img: 'blog1.png' },
+  { title: 'Prototyping Smarter with AI Tools', category: 'AI', brief: 'Discover faster prototyping with AI tools.', details: 'Full content: AI-based prototyping tools help designers and engineers rapidly test concepts, reducing development time and costs while improving design quality.', img: 'blog2.png' },
+  { title: 'AI in Healthcare', category: 'AI', brief: 'How AI is revolutionizing healthcare services.', details: 'Full content: AI algorithms are used in diagnostics, personalized treatment plans, and predictive analytics to improve patient outcomes and optimize hospital workflows.', img: 'blog3.png' },
+  { title: 'Machine Learning for Business', category: 'Analytics', brief: 'Boost your business with ML solutions.', details: 'Full content: ML models analyze data to optimize operations, enhance customer experiences, and drive strategic business decisions.', img: 'blog4.png' },
+  { title: 'Automation Trends in 2025', category: 'Automation', brief: 'Latest trends in automation across industries.', details: 'Full content: Robotic process automation, AI-driven workflows, and intelligent manufacturing systems are shaping the future of business efficiency.', img: 'blog5.png' },
+  { title: 'Data Analytics for Smarter Decisions', category: 'Analytics', brief: 'Make informed decisions using analytics.', details: 'Full content: Data visualization dashboards and predictive analytics provide actionable insights for business leaders.', img: 'blog6.png' },
+];
+
+const grid = document.getElementById('articleGrid');
+const modalsContainer = document.getElementById('modalsContainer');
+
+// Generate cards & modals
+articles.forEach((a, i) => {
+  const card = document.createElement('div');
+  card.className = 'article-card';
+  card.innerHTML = `
+    <img src="/static/images/${a.img}" alt="Blog ${i+1}">
+    <div class="article-card-content">
+      <div class="category">${a.category}</div>
+      <h3>${a.title}</h3>
+      <p>${a.brief}</p>
+      <a onclick="openModal(${i})">Read More →</a>
+    </div>
+  `;
+  grid.appendChild(card);
+
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'modal' + i;
+  modal.innerHTML = `
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal(${i})">&times;</span>
+      <h2>${a.title}</h2>
+      <p>${a.details}</p>
+    </div>
+  `;
+  modalsContainer.appendChild(modal);
+});
+
+// Modal functions
+function openModal(id){ document.getElementById('modal'+id).style.display='block'; }
+function closeModal(id){ document.getElementById('modal'+id).style.display='none'; }
+window.onclick=function(event){ if(event.target.classList.contains('modal')){ event.target.style.display='none'; } }
+</script>
+
+</body>
+</html>

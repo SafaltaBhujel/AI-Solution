@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Events | AI-Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f0f4f8; color: #333; scroll-behavior: smooth; }
+
+.events-hero { text-align: center; padding: 140px 20px 80px; color: #fff; background: linear-gradient(135deg,#6ec1ff,#ff6ec7); }
+.events-hero h1 { font-size: 3rem; font-weight: 700; margin-bottom: 15px; text-shadow: 2px 2px 15px rgba(0,0,0,0.3); }
+.events-hero p { font-size: 1.3rem; max-width: 700px; margin: 0 auto; font-weight: 500; }
+
+.events-container { max-width: 1200px; margin: auto; padding: 60px 20px; }
+.event-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+
+.event-card { 
+    background: #fff; 
+    border-radius: 20px; 
+    overflow: hidden; 
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
+    transition: transform 0.4s, box-shadow 0.4s; 
+    cursor: pointer; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.event-card:hover { transform: translateY(-10px); box-shadow: 0 25px 60px rgba(0,0,0,0.15); }
+
+.event-card img { 
+    width: 100%; 
+    height: 220px; 
+    object-fit: cover; 
+    border-top-left-radius: 20px; 
+    border-top-right-radius: 20px; 
+    transition: transform 0.5s ease, filter 0.5s ease; 
+}
+
+.event-card:hover img { 
+    transform: scale(1.05); 
+    filter: brightness(1.1); 
+}
+
+.event-card-content { 
+    padding: 25px; 
+    flex-grow: 1; 
+    display: flex; 
+    flex-direction: column; 
+    justify-content: space-between; 
+}
+
+.event-card-content .category { font-size: 0.75rem; font-weight: 600; color: #ff6ec7; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+.event-card-content h3 { font-size: 1.3rem; margin-bottom: 12px; color: #222; }
+.event-card-content p { font-size: 1rem; line-height: 1.6; margin-bottom: 18px; color: #555; }
+.event-card-content a.participate-btn { 
+    display: inline-block; 
+    background: linear-gradient(135deg,#ff6ec7,#6ec1ff); 
+    color: #fff; 
+    padding: 10px 22px; 
+    border-radius: 30px; 
+    font-weight: 500; 
+    transition: all 0.4s; 
+    text-decoration: none; 
+    text-align: center; 
+}
+.event-card-content a.participate-btn:hover { 
+    transform: translateY(-3px); 
+    background: linear-gradient(135deg,#6ec1ff,#ff6ec7); 
+}
+
+.main-footer { background: #222; color: #fff; text-align: center; padding: 40px 0; font-size: 0.95rem; }
+
+@media(max-width:768px){ .event-card img{ height:180px; } }
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<header class="navbar">
+<div class="container nav-container">
+<div class="logo"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="AI-Solutions Logo" style="width:35px;"></div>
+<nav id="nav-menu">
+<ul class="nav-links">
+<li><a href="{{ url_for('landing') }}">Home</a></li>
+<li><a href="{{ url_for('about') }}">About Us</a></li>
+<li><a href="{{ url_for('solutions') }}">Solutions</a></li>
+<li><a href="{{ url_for('services') }}">Services</a></li>
+<li><a href="{{ url_for('case_studies') }}">Case Studies</a></li>
+<li><a href="{{ url_for('articles') }}">Articles</a></li>
+<li><a href="{{ url_for('events') }}" class="active">Events</a></li>
+<li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+<li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+<li><a href="{{ url_for('contact') }}">Contact</a></li>
+</ul>
+<div class="hamburger" onclick="toggleMenu()">☰</div>
+</nav>
+</div>
+</header>
+
+<!-- Hero Section -->
+<section class="events-hero">
+<div class="container">
+<h1>Upcoming Events</h1>
+<p>Stay updated on our latest AI workshops, webinars, and industry events.</p>
+</div>
+</section>
+
+<!-- Events Grid -->
+<div class="events-container">
+<div class="event-grid" id="eventGrid"></div>
+</div>
+
+<footer class="main-footer">
+<p>© 2025 AI-Solutions | All Rights Reserved</p>
+</footer>
+
+<script>
+// Navbar toggle
+function toggleMenu(){ document.getElementById('nav-menu').classList.toggle('active'); }
+
+// Events Data
+const events = [
+{title:'AI Workshop 2025',category:'Workshop',brief:'Hands-on AI workshop for beginners.',img:'ai_workshop.png'},
+{title:'Webinar on Automation',category:'Webinar',brief:'Learn the latest in automation trends.',img:'automation_webinar.png'},
+{title:'Data Analytics Bootcamp',category:'Bootcamp',brief:'Intensive analytics training program.',img:'data_bootcamp.png'},
+{title:'AI Summit 2025',category:'Conference',brief:'Annual AI industry conference.',img:'ai_summit.png'},
+{title:'Customer Experience Webinar',category:'Webinar',brief:'Improving CX with AI tools.',img:'cx_webinar.png'}
+];
+
+const grid = document.getElementById('eventGrid');
+
+events.forEach((e,i)=>{
+    const card = document.createElement('div');
+    card.className='event-card';
+    card.innerHTML=`
+      <img src="/static/images/${e.img}" alt="${e.title}">
+      <div class="event-card-content">
+        <div class="category">${e.category}</div>
+        <h3>${e.title}</h3>
+        <p>${e.brief}</p>
+        <a href="/participate/${i}" class="participate-btn">Participate</a>
+      </div>`;
+    grid.appendChild(card);
+});
+</script>
+
+</body>
+</html>

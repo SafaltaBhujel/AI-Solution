@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Case Study</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_style.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+    body { font-family: 'Inter', sans-serif; background: #f9f9f9; color: #333; margin:0; padding:0; }
+    .container { max-width: 700px; margin: 50px auto; padding: 30px; background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);}
+    h1 { text-align: center; color: #2c3e50; margin-bottom: 30px; font-weight:700;}
+    form { display: flex; flex-direction: column; gap: 15px; }
+    input, textarea, select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; width: 100%; }
+    button { padding: 10px; border-radius: 8px; border:none; background:#3498db; color:#fff; font-weight:600; cursor:pointer; transition:0.2s; }
+    button:hover { background:#2980b9; }
+    img { max-width: 150px; margin-top: 5px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Edit Case Study</h1>
+    <form action="{{ url_for('edit_case_study', id=case.id) }}" method="POST" enctype="multipart/form-data">
+        <label>Title</label>
+        <input type="text" name="title" value="{{ case.title }}" required>
+
+        <label>Category</label>
+        <input type="text" name="category" value="{{ case.category }}" required>
+
+        <label>Description</label>
+        <textarea name="description" rows="5" required>{{ case.description }}</textarea>
+
+        <label>Current Image</label>
+        {% if case.image %}
+            <img src="{{ url_for('static', filename='images/case_studies/' + case.image) }}">
+        {% endif %}
+
+        <label>Change Image</label>
+        <input type="file" name="image">
+
+        <button type="submit"><i class="fas fa-save"></i> Update Case Study</button>
+    </form>
+</div>
+</body>
+</html>

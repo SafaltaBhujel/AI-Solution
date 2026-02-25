@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Article | AI Solutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body { margin:0; font-family: Arial, sans-serif; background: #f4f6f9; }
+
+    /* Sidebar */
+    .sidebar {
+        width: 240px; height: 100vh; background: #111827; color: #fff; position: fixed; padding: 2rem 1rem;
+    }
+    .sidebar h2 { font-size: 1.6rem; font-weight: 700; margin-bottom: 2rem; text-align: center; }
+    .sidebar a { display: block; color: #fff; padding: 12px 15px; text-decoration: none; margin: 5px 0; border-radius: 6px; transition: 0.3s; }
+    .sidebar a:hover { background: #374151; }
+
+    /* Main content */
+    .main { margin-left: 260px; padding: 2rem; }
+    h1 { margin-bottom: 1.5rem; font-weight: 700; }
+
+    /* Form styling */
+    form { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .form-group { margin-bottom: 1rem; }
+    label { font-weight: 600; }
+    input[type="text"], textarea, input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    textarea { resize: vertical; min-height: 120px; }
+    .btn-primary { background: #6366f1; color: #fff; }
+    .btn-primary:hover { background: #4f46e5; color: #fff; }
+
+    /* Image preview */
+    #imagePreview { margin-top: 10px; max-width: 200px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2>Admin</h2>
+    <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+    <a href="{{ url_for('admin_feedback_page') }}">Feedback</a>
+    <a href="#">Manage Users</a>
+    <a href="#">Manage Roles</a>
+    <a href="#">Events</a>
+    <a href="#">Gallery</a>
+    <a href="#">Customer Inquiry</a>
+    <a href="{{ url_for('admin_articles') }}">Articles</a>
+    <a href="#">Case Studies</a>
+    <a href="#">User Dashboard</a>
+    <a href="#">Logout</a>
+</div>
+
+<!-- Main content -->
+<div class="main">
+    <h1>Add New Article</h1>
+
+    <form action="{{ url_for('add_article') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Article Title</label>
+            <input type="text" id="title" name="title" required placeholder="Enter article title">
+        </div>
+
+        <div class="form-group">
+            <label for="author">Author Name</label>
+            <input type="text" id="author" name="author" required placeholder="Enter author name">
+        </div>
+
+        <div class="form-group">
+            <label for="content">Content</label>
+            <textarea id="content" name="content" required placeholder="Write article content here..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Article Image</label>
+            <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
+            <img id="imagePreview" src="#" alt="Image Preview" style="display:none;">
+        </div>
+
+        <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add Article</button>
+    </form>
+</div>
+
+<script>
+function previewImage(event) {
+    const preview = document.getElementById('imagePreview');
+    const file = event.target.files[0];
+    if(file) {
+        preview.src = URL.createObjectURL(file);
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

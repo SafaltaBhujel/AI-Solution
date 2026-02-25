@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Contact Messages</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #f4f7fb; margin: 0; padding: 0; }
+        .container { max-width: 1200px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #ff6ec7; margin-bottom: 30px; }
+        
+        /* Search bar */
+        .search-bar { margin-bottom: 20px; display: flex; justify-content: flex-end; }
+        .search-bar input {
+            padding: 10px 15px;
+            width: 250px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th, td { padding: 12px 15px; border: 1px solid #ddd; text-align: left; word-wrap: break-word; }
+        th { background: #ff6ec7; color: #fff; position: sticky; top: 0; }
+        tr:nth-child(even) { background: #f9f9f9; }
+        tr:hover { background: #ffe0f0; }
+
+        /* Action buttons */
+        .btn { padding: 5px 10px; border-radius: 5px; font-size: 0.9rem; cursor: pointer; border: none; }
+        .btn-delete { background: #c70077; color: #fff; }
+        .btn-read { background: #6ec1ff; color: #fff; }
+
+        .no-messages { text-align: center; padding: 20px; font-weight: 600; color: #c70077; }
+
+        @media(max-width: 900px){
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; }
+            tr { margin-bottom: 20px; }
+            td { padding-left: 50%; position: relative; text-align: right; }
+            td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                width: 45%;
+                padding-left: 5px;
+                font-weight: 600;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Contact Messages</h1>
+
+        <!-- Optional search -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search messages by name or email..." onkeyup="filterTable()">
+        </div>
+
+        {% if messages %}
+        <table id="messagesTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Company</th>
+                    <th>Country</th>
+                    <th>Job Title</th>
+                    <th>Message</th>
+                    <th>Submitted At</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for msg in messages %}
+                <tr>
+                    <td data-label="ID">{{ msg.id }}</td>
+                    <td data-label="Name">{{ msg.name }}</td>
+                    <td data-label="Email">{{ msg.email }}</td>
+                    <td data-label="Phone">{{ msg.phone }}</td>
+                    <td data-label="Company">{{ msg.company }}</td>
+                    <td data-label="Country">{{ msg.country }}</td>
+                    <td data-label="Job Title">{{ msg.job_title }}</td>
+                    <td data-label="Message">{{ msg.message }}</td>
+                    <td data-label="Submitted At">{{ msg.created_at }}</td>
+                    <td data-label="Actions">
+                        <button class="btn btn-read"><i class="fas fa-check"></i></button>
+                        <button class="btn btn-delete"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-messages">No contact messages found.</p>
+        {% endif %}
+    </div>
+
+    <script>
+        function filterTable() {
+            const input = document.getElementById("searchInput");
+            const filter = input.value.toLowerCase();
+            const table = document.getElementById("messagesTable");
+            const tr = table.getElementsByTagName("tr");
+            for (let i = 1; i < tr.length; i++) {
+                const tds = tr[i].getElementsByTagName("td");
+                let show = false;
+                for (let j = 1; j <= 2; j++) { // Name & Email
+                    if (tds[j] && tds[j].textContent.toLowerCase().includes(filter)) {
+                        show = true;
+                        break;
+                    }
+                }
+                tr[i].style.display = show ? "" : "none";
+            }
+        }
+    </script>
+</body>
+</html>

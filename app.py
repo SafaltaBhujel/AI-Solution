@@ -23,6 +23,10 @@ from werkzeug.utils import secure_filename
 from flask_login import login_required
 from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 from datetime import datetime
+from email.mime.text import MIMEText
+import smtplib
+import sqlite3
+
 
 
 # Load .env file
@@ -73,45 +77,160 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 SITE_KEY = os.getenv('RECAPTCHA_SITE_KEY')
 SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY')
+
+
+
 DB_FILE = 'users.db'
+import sqlite3
 # SQLite Database
 DB_FILE = 'users.db'
+
+import sqlite3
+import sqlite3
+
+DATABASE = 'database.db'  # your SQLite database file
+
+
 def get_db():
     conn = sqlite3.connect(DB_FILE)
     conn.row_factory = sqlite3.Row
     return conn
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row  # optional: allows dict-like access
+    return conn
+
+from flask_sqlalchemy import SQLAlchemy
+
+# --- Forgot Password Form ---
+@app.route('/admin/forgot-password', methods=['GET', 'POST'])
+def admin_forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        admin = Admin.query.filter_by(email=email).first()
+        if admin:
+            token = serializer.dumps(email, salt='admin-reset-salt')
+            reset_url = url_for('admin_reset_password', token=token, _external=True)
+            
+            # Send email
+            msg = Message('Admin Password Reset', recipients=[email])
+            msg.body = f'Click the link to reset your password: {reset_url}'
+            try:
+                mail.send(msg)
+                flash('Reset link sent to your email.', 'success')
+            except Exception as e:
+                flash('Failed to send email.', 'danger')
+        else:
+            flash('Email not found.', 'danger')
+        return redirect(url_for('admin_forgot_password'))
+
+    return render_template('admin_forgot_password.html')
+
+
+# --- Reset Password Form ---
+@app.route('/admin/reset-password/<token>', methods=['GET', 'POST'])
+def admin_reset_password(token):
+    try:
+        email = serializer.loads(token, salt='admin-reset-salt', max_age=3600)  # 1 hour expiry
+    except Exception:
+        flash('The reset link is invalid or expired.', 'danger')
+        return redirect(url_for('admin_forgot_password'))
+
+    if request.method == 'POST':
+        new_password = request.form['password']
+        admin = Admin.query.filter_by(email=email).first()
+        admin.password = generate_password_hash(new_password)
+        db.session.commit()
+        flash('Password updated successfully!', 'success')
+        return redirect(url_for('admin_login'))
+
+    return render_template('admin_reset_password.html')
+
+
+
+# ✅ Add this configuration BEFORE initializing SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ai_solutions.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+class ContactMessage(db.Model):
+    __tablename__ = 'contact_messages'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(20))
+    company = db.Column(db.String(100))
+    country = db.Column(db.String(50))
+    job_title = db.Column(db.String(100), nullable=False)
+    job_details = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+with app.app_context():
+    db.create_all()
+
+class CustomerInquiry(db.Model):
+    __tablename__ = 'customer_inquiries'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    phone = db.Column(db.String(20))
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 def init_db():
     with get_db() as db:
+        # Users table
         db.execute('''CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
-            otp_secret TEXT NOT NULL,
+            otp_secret TEXT,
             last_password_change TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            previous_password_hash TEXT,
-            previous_password_hash2 TEXT,
-            previous_password_hash3 TEXT,
-            reset_token TEXT,
-            reset_token_expiry TIMESTAMP,
-            email_verified INTEGER DEFAULT 0,
-            verification_token TEXT,
-            verification_token_expiry TIMESTAMP,
             failed_login_attempts INTEGER DEFAULT 0,
             lockout_time TIMESTAMP,
-            last_login DATETIME,
+            last_login TIMESTAMP,
             role TEXT DEFAULT 'user',
-            is_enabled INTEGER DEFAULT 1,
-            profile_image TEXT DEFAULT NULL
+            email_verified INTEGER DEFAULT 0,
+            is_enabled INTEGER DEFAULT 1
         )''')
 
+        # Feedback messages table
+        db.execute('''CREATE TABLE IF NOT EXISTS feedback_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            status TEXT DEFAULT 'Pending'  
+        )''')
+
+        db.commit()
+
+      
+        # --- Roles table ---
         db.execute('''CREATE TABLE IF NOT EXISTS roles (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT UNIQUE NOT NULL,
             permissions TEXT NOT NULL
         )''')
 
+        # =======================
+        # SEED ROLES
+        # =======================
+        existing_roles = db.execute("SELECT COUNT(*) AS count FROM roles").fetchone()['count']
+        if existing_roles == 0:
+            db.execute('''INSERT INTO roles (name, permissions) VALUES
+                ('admin', 'manage_users,edit_posts,delete_posts,change_roles,enable_disable_users'),
+                ('moderator', 'edit_posts'),
+                ('user', '')''')
+
+     
+        # Audit logs table
         db.execute('''CREATE TABLE IF NOT EXISTS audit_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT,
@@ -121,14 +240,55 @@ def init_db():
             timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )''')
 
-        existing_roles = db.execute('SELECT COUNT(*) AS count FROM roles').fetchone()['count']
-        if existing_roles == 0:
-            db.execute('''INSERT INTO roles (name, permissions) VALUES
-                ('admin', 'manage_users,edit_posts,delete_posts,change_roles,enable_disable_users'),
-                ('moderator', 'edit_posts'),
-                ('user', '')''')
-        db.commit()
+        # Contact messages table
+       # Initialize tables
 
+    
+
+    db.execute('''CREATE TABLE IF NOT EXISTS articles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        content TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    db.execute('''CREATE TABLE IF NOT EXISTS events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        event_date DATETIME,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )''')
+
+    
+conn = get_db_connection()
+conn.execute('''CREATE TABLE IF NOT EXISTS Gallery (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    image TEXT DEFAULT 'default-gallery.jpg',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)''')
+conn.commit()
+conn.close()
+
+
+class CaseStudy(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
+    client_name = db.Column(db.String(150))
+    duration = db.Column(db.String(50))  # e.g., "Jan 2025 - Mar 2025"
+    description = db.Column(db.Text, nullable=False)
+    image = db.Column(db.String(200))  # filename of uploaded image
+    tags = db.Column(db.String(200))
+    status = db.Column(db.String(20), default='Draft')  # Draft / Published
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+
+# Initialize DB
 init_db()
 
 
@@ -170,6 +330,117 @@ def load_user(user_id):
     db = get_db()
     row = db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
     return User(row) if row else None
+
+@app.route('/schedule_demo', methods=['GET', 'POST'])
+def schedule_demo():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        company = request.form.get('company')
+        country = request.form.get('country')
+        interests = request.form.getlist('interest')
+        message = request.form.get('message')
+
+        # Save to database or CSV
+        flash("Your demo request has been submitted successfully!", "success")
+        return redirect(url_for('landing'))
+
+    return render_template('schedule_demo.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
+@app.route('/submit_contact', methods=['POST'])
+def submit_contact():
+    new_msg = ContactMessage(
+        name=request.form['name'],
+        email=request.form['email'],
+        phone=request.form.get('phone', ''),
+        company=request.form.get('company', ''),
+        country=request.form['country'],
+        job_title=request.form['job_title'],
+        job_details=request.form['job_details']
+    )
+    db.session.add(new_msg)
+    db.session.commit()
+
+    flash('Your request has been submitted successfully!', 'success')
+    return redirect(url_for('contact'))
+
+
+    # Optional: email notification to admin
+    try:
+        admin_email = os.getenv('MAIL_USERNAME')
+        msg = Message(f'New Contact Request from {name}', recipients=[admin_email])
+        msg.body = f"""
+Name: {name}
+Email: {email}
+Phone: {phone}
+Company: {company}
+Country: {country}
+Job Title: {job_title}
+
+Job Details:
+{message}
+"""
+        mail.send(msg)
+    except Exception as e:
+        print("Mail not sent:", e)
+
+    flash('Your request has been submitted successfully!', 'success')
+    return redirect(url_for('contact'))
+
+
+@app.route('/admin/contact_messages')
+def admin_contact_messages():
+    messages = ContactMessage.query.order_by(ContactMessage.created_at.asc()).all()
+    return render_template('admin_contact_messages.html', messages=messages)
+
+
+
+
+@app.route('/admin/contact-messages/delete/<int:id>', methods=['POST'])
+@admin_required
+def delete_contact_message(id):
+    msg = ContactMessage.query.get_or_404(id)
+    db.session.delete(msg)
+    db.session.commit()
+    flash('Message deleted successfully!', 'success')
+    return redirect(url_for('admin_contact_messages'))
+
+
+
+@app.route('/admin-login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        password = request.form['password']
+
+        db = get_db()
+        user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
+
+        if not user:
+            flash('Invalid credentials.', 'danger')
+            return redirect(url_for('admin_login'))
+
+        if user['role'] != 'admin':
+            flash('You are not authorized to access admin panel.', 'danger')
+            return redirect(url_for('login'))
+
+        if bcrypt.check_password_hash(user['password_hash'], password):
+            session['user'] = username
+            session['role'] = 'admin'
+            log_event(username, 'admin_login_success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid credentials.', 'danger')
+            log_event(username, 'admin_login_failed')
+            return redirect(url_for('admin_login'))
+
+    return render_template('admin/admin_login.html')
+
 
 
 
@@ -456,7 +727,373 @@ def edit_post():
 
 @app.route('/')
 def landing():
-    return redirect(url_for('dashboard')) if 'user' in session else render_template('landing.html')
+    return redirect(url_for('dashboard')) if 'user' in session else render_template(
+        'landing.html', current_year=datetime.now().year
+    )
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
+@app.route('/solutions')
+def solutions():
+    return render_template('solutions.html')
+
+
+
+@app.route('/services')
+def services():
+    return render_template('services.html', active='services')
+
+
+@app.route('/case-studies')
+def case_studies():
+    return render_template('case_studies.html', active='case_studies')
+
+# View all case studies
+@app.route('/admin/case_studies')
+def admin_case_studies():
+    with get_db() as db:
+        cursor = db.execute('SELECT * FROM case_studies ORDER BY created_at DESC')
+        case_studies = cursor.fetchall()
+    return render_template('admin/case_studies.html', case_studies=case_studies)
+
+# Add new case study
+@app.route('/admin/case_studies/add', methods=['GET','POST'])
+def add_case_study():
+    if request.method == 'POST':
+        title = request.form['title']
+        category = request.form['category']
+        description = request.form['description']
+        file = request.files['image']
+        filename = None
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        with get_db() as db:
+            db.execute('''
+                INSERT INTO case_studies (title, category, description, image)
+                VALUES (?, ?, ?, ?)
+            ''', (title, category, description, filename))
+            db.commit()
+        
+        flash('Case study added successfully!', 'success')
+        return redirect(url_for('admin_case_studies'))
+
+    return render_template('admin/add_case_study.html')
+
+# Edit case study
+@app.route('/admin/case_studies/edit/<int:id>', methods=['GET','POST'])
+def edit_case_study(id):
+    with get_db() as db:
+        cursor = db.execute('SELECT * FROM case_studies WHERE id=?', (id,))
+        case = cursor.fetchone()
+    
+    if request.method == 'POST':
+        title = request.form['title']
+        category = request.form['category']
+        description = request.form['description']
+        file = request.files['image']
+        filename = case['image']  # keep old image if no new upload
+
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        with get_db() as db:
+            db.execute('''
+                UPDATE case_studies
+                SET title=?, category=?, description=?, image=?
+                WHERE id=?
+            ''', (title, category, description, filename, id))
+            db.commit()
+
+        flash('Case study updated successfully!', 'success')
+        return redirect(url_for('admin_case_studies'))
+
+    return render_template('admin/edit_case_study.html', case=case)
+
+# Delete case study
+@app.route('/admin/case_studies/delete/<int:id>', methods=['POST'])
+def delete_case_study(id):
+    with get_db() as db:
+        db.execute('DELETE FROM case_studies WHERE id=?', (id,))
+        db.commit()
+    flash('Case study deleted successfully!', 'success')
+    return redirect(url_for('admin_case_studies'))
+
+# ------------------ PUBLIC FEEDBACK PAGE ------------------
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback():
+    if request.method == 'POST':
+        name = request.form['name']
+        email = request.form['email']
+        rating = request.form.get('rating', 0)
+        message = request.form['message']
+
+        with get_db() as db:
+            db.execute('''
+                INSERT INTO feedback_messages (name, email, rating, message)
+                VALUES (?, ?, ?, ?)
+            ''', (name, email, rating, message))
+            db.commit()
+
+        # Optional: send email to admin
+        try:
+            admin_email = os.getenv('MAIL_USERNAME')
+            msg = Message(f'New Feedback from {name}', recipients=[admin_email])
+            msg.body = f"""
+Name: {name}
+Email: {email}
+Rating: {rating}
+Message:
+{message}
+"""
+            mail.send(msg)
+        except Exception as e:
+            print("Mail not sent:", e)
+
+        flash('Your feedback has been submitted successfully!', 'success')
+        return redirect(url_for('feedback'))
+
+    return render_template('feedback.html')
+
+# ------------------ ADMIN FEEDBACK PAGE ------------------
+@app.route('/admin/feedback')
+def admin_feedback_page():
+    with get_db() as db:
+        feedbacks = db.execute("SELECT * FROM feedback_messages ORDER BY created_at DESC").fetchall()
+    return render_template('admin_feedback.html', feedbacks=feedbacks)
+
+# ------------------ APPROVE FEEDBACK ------------------
+@app.route('/admin/feedback/approve/<int:feedback_id>', methods=['POST'])
+def approve_feedback(feedback_id):
+    with get_db() as db:
+        db.execute("UPDATE feedback_messages SET status = 'Approved' WHERE id = ?", (feedback_id,))
+        db.commit()
+    flash("Feedback approved successfully!")
+    return redirect(url_for('admin_feedback_page'))
+
+# ------------------ DECLINE FEEDBACK ------------------
+@app.route('/admin/feedback/decline/<int:feedback_id>', methods=['POST'])
+def decline_feedback(feedback_id):
+    with get_db() as db:
+        db.execute("UPDATE feedback_messages SET status = 'Declined' WHERE id = ?", (feedback_id,))
+        db.commit()
+    flash("Feedback declined successfully!")
+    return redirect(url_for('admin_feedback_page'))
+
+@app.route('/articles')
+def articles():
+    return render_template('articles.html', active='articles')
+# ------------------ Admin Articles Routes ------------------
+
+# Admin: View all articles
+@app.route('/admin/articles')
+def admin_articles():
+    db = get_db()  # your database connection function
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM articles ORDER BY created_at DESC")
+    articles = cursor.fetchall()
+    return render_template('admin_articles.html', articles=articles)
+
+
+# Admin: Add new article
+@app.route('/admin/articles/add', methods=['GET', 'POST'])
+def add_article():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        image = request.files.get('image')
+
+        filename = 'default-articles.jpg'
+        if image:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join('static/uploads', filename))
+
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute(
+            "INSERT INTO articles (title, content, image) VALUES (?, ?, ?)",
+            (title, content, filename)
+        )
+        db.commit()
+        flash('Article added successfully!', 'success')
+        return redirect(url_for('admin_articles'))
+
+    return render_template('add_article.html')
+
+
+# Admin: Delete article
+@app.route('/admin/articles/delete/<int:id>')
+def delete_article(id):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("DELETE FROM articles WHERE id = ?", (id,))
+    db.commit()
+    flash('Article deleted successfully!', 'success')
+    return redirect(url_for('admin_articles'))
+
+
+# Admin: Edit article
+@app.route('/admin/articles/edit/<int:id>', methods=['GET', 'POST'])
+def edit_article(id):
+    db = get_db()
+    cursor = db.cursor()
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        image = request.files.get('image')
+
+        if image:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join('static/uploads', filename))
+            cursor.execute(
+                "UPDATE articles SET title=?, content=?, image=? WHERE id=?",
+                (title, content, filename, id)
+            )
+        else:
+            cursor.execute(
+                "UPDATE articles SET title=?, content=? WHERE id=?",
+                (title, content, id)
+            )
+
+        db.commit()
+        flash('Article updated successfully!', 'success')
+        return redirect(url_for('admin_articles'))
+
+    cursor.execute("SELECT * FROM articles WHERE id = ?", (id,))
+    article = cursor.fetchone()
+    return render_template('edit_article.html', article=article)
+
+
+
+
+@app.route('/gallery')
+def gallery():
+    return render_template('gallery.html', active='gallery')
+# Define the SQLite database file path
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, 'database.db')  # or whatever name you want
+
+# Database connection function
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# Admin Gallery - View all
+@app.route('/admin/gallery')
+def admin_gallery():
+    conn = get_db_connection()
+    gallery_items = conn.execute('SELECT * FROM Gallery').fetchall()
+    conn.close()
+    return render_template('admin_gallery.html', gallery=gallery_items)
+
+# Add new gallery item
+@app.route('/admin/gallery/add', methods=['GET', 'POST'])
+def add_gallery():
+    if request.method == 'POST':
+        title = request.form['title']
+        image = request.files['image']
+
+        if image and title:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+            conn = get_db_connection()
+            conn.execute('INSERT INTO Gallery (title, image) VALUES (?, ?)',
+                         (title, filename))
+            conn.commit()
+            conn.close()
+            flash('Gallery item added successfully!', 'success')
+            return redirect(url_for('admin_gallery'))
+        else:
+            flash('Please provide a title and image.', 'danger')
+
+    return render_template('add_gallery.html')
+
+# Edit gallery item
+@app.route('/admin/gallery/edit/<int:id>', methods=['GET', 'POST'])
+def edit_gallery(id):
+    conn = get_db_connection()
+    item = conn.execute('SELECT * FROM Gallery WHERE id = ?', (id,)).fetchone()
+
+    if request.method == 'POST':
+        title = request.form['title']
+        image = request.files.get('image', None)
+        filename = item['image']  # keep old image by default
+
+        if image:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+        conn.execute('UPDATE Gallery SET title = ?, image = ? WHERE id = ?',
+                     (title, filename, id))
+        conn.commit()
+        conn.close()
+        flash('Gallery item updated!', 'success')
+        return redirect(url_for('admin_gallery'))
+
+    conn.close()
+    return render_template('edit_gallery.html', item=item)
+
+# Delete gallery item
+@app.route('/admin/gallery/delete/<int:id>', methods=['POST'])
+def delete_gallery(id):
+    conn = get_db_connection()
+    conn.execute('DELETE FROM Gallery WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    flash('Gallery item deleted!', 'success')
+    return redirect(url_for('admin_gallery'))
+@app.route('/events')
+def events():
+    return render_template('events.html', active='events')
+
+# Upload folder
+UPLOAD_FOLDER = 'static/uploads/events'
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
+# ------------------ ADMIN: Show Events ------------------
+@app.route('/admin/events')
+def admin_events():
+    with get_db() as db:
+        events = db.execute("SELECT * FROM Events ORDER BY event_date DESC").fetchall()
+    return render_template('admin_events.html', events=events)
+
+# ------------------ ADMIN: Add New Event ------------------
+@app.route('/admin/events/add', methods=['GET', 'POST'])
+def add_event():
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        event_date = request.form['event_date']
+        image_file = request.files.get('image')
+
+        if image_file and image_file.filename != '':
+            filename = secure_filename(image_file.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image_file.save(image_path)
+        else:
+            filename = 'default-event.jpg'
+
+        with get_db() as db:
+            db.execute('''
+                INSERT INTO Events (title, description, event_date, image)
+                VALUES (?, ?, ?, ?)
+            ''', (title, description, event_date, filename))
+            db.commit()
+
+        flash('Event added successfully!', 'success')
+        return redirect(url_for('admin_events'))
+
+    return render_template('add_event.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -843,7 +1480,8 @@ def logout():
         log_event(user, 'logout')
 
     flash('Logged out.', 'info')
-    return redirect(url_for('login'))
+    return redirect(url_for('landing'))  # <-- redirect to landing page
+
 
 
 @app.route('/login/google')
@@ -902,10 +1540,18 @@ def print_custom_url():
 
 threading.Thread(target=print_custom_url).start()
 if __name__ == "__main__":
-    app.debug = True  
-    app.run(
-        host='127.0.0.1',
-        port=5000,
-        ssl_context=('certs/myapp.local+2.pem', 'certs/myapp.local+2-key.pem')
-    )
-
+    # Render provides a PORT, locally we use 5000
+    port = int(os.environ.get("PORT", 5000))
+    
+    # Check if we are running on Render (Render sets the 'RENDER' env var)
+    if os.environ.get("RENDER"):
+        # PRODUCTION MODE: No SSL here (Render handles SSL for you)
+        app.run(host='0.0.0.0', port=port)
+    else:
+        # LOCAL MODE: Use your certificates and debug mode
+        app.run(
+            host='127.0.0.1', 
+            port=port, 
+            debug=True,
+            ssl_context=('certs/myapp.local+2.pem', 'certs/myapp.local+2-key.pem')
+        )

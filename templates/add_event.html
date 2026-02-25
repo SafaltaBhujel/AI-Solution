@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Event</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; background:#f4f6f9; }
+    .sidebar { width:220px; height:100vh; background:#111827; color:#fff; position:fixed; padding:1rem; }
+    .sidebar a { display:block; color:#fff; padding:10px; text-decoration:none; margin:5px 0; border-radius:6px; }
+    .sidebar a:hover { background:#374151; }
+    .main { margin-left:240px; padding:2rem; }
+    form { background:#fff; padding:2rem; border-radius:8px; max-width:600px; }
+    input, textarea { width:100%; padding:10px; margin:10px 0; border-radius:4px; border:1px solid #ccc; }
+    button { padding:10px 15px; background:#10b981; color:#fff; border:none; border-radius:4px; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+  <h2>Admin</h2>
+  <a href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+  <a href="{{ url_for('admin_events') }}">Events</a>
+  <a href="#">Articles</a>
+  <a href="#">Feedback</a>
+  <a href="#">Users</a>
+  <a href="#">Logout</a>
+</div>
+
+<!-- Main Content -->
+<div class="main">
+  <h1>Add New Event</h1>
+  <form action="{{ url_for('add_event') }}" method="POST" enctype="multipart/form-data">
+    <label>Title</label>
+    <input type="text" name="title" required>
+    
+    <label>Description</label>
+    <textarea name="description" rows="5" required></textarea>
+    
+    <label>Event Date</label>
+    <input type="date" name="event_date" required>
+    
+    <label>Image (optional)</label>
+    <input type="file" name="image" accept="image/*">
+    
+    <button type="submit"><i class="fa fa-plus"></i> Add Event</button>
+  </form>
+</div>
+
+</body>
+</html>

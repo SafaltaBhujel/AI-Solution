@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us | AI-Solutions</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+/* ---------------- Base Styles ---------------- */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f7f8fc;
+    color: #333;
+}
+.container { width: 90%; max-width: 1200px; margin: 0 auto; }
+h1, h2, h3, h4 { margin-bottom: 15px; }
+p { margin-bottom: 20px; line-height: 1.7; color: #555; }
+
+/* ---------------- Hero Section ---------------- */
+.about-hero {
+    text-align: center;
+    padding: 150px 20px 100px 20px;
+    background: linear-gradient(135deg, #6ec1ff 0%, #ff6ec7 100%);
+    color: #fff;
+    border-bottom-left-radius: 50px;
+    border-bottom-right-radius: 50px;
+}
+.about-hero h1 { font-size: 3rem; font-weight: 800; margin-bottom: 20px; }
+.about-hero p { font-size: 1.3rem; max-width: 650px; margin: 0 auto; font-weight: 500; }
+
+/* ---------------- Section Titles ---------------- */
+h2 {
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #222;
+    position: relative;
+}
+h2::after {
+    content: "";
+    display: block;
+    width: 60px; height: 4px;
+    background: #6ec1ff;
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+/* ---------------- Mission & Vision ---------------- */
+.about-mission-vision {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    margin: 100px auto;
+    max-width: 1200px;
+    padding: 0 20px;
+}
+.mission-card, .vision-card {
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.5);
+    padding: 40px 30px;
+    border-radius: 26px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.4s ease;
+    text-align: center;
+}
+.mission-card:hover, .vision-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #6ec1ff, #667eea);
+    color: #fff;
+}
+.mission-card i, .vision-card i {
+    font-size: 3rem;
+    color: #5562ea;
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+}
+.mission-card:hover i, .vision-card:hover i { color: #fff; }
+.mission-card h3, .vision-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+
+/* ---------------- Core Values ---------------- */
+.about-values { max-width: 1200px; margin: 100px auto; padding: 0 20px; }
+.about-values ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px,1fr));
+    gap: 30px; list-style: none; padding: 0;
+}
+.about-values li {
+    background: #fff;
+    padding: 30px 20px;
+    border-radius: 22px;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: all 0.4s ease;
+}
+.about-values li:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    background: linear-gradient(135deg, #667eea, #6ec1ff);
+    color: #fff;
+}
+.about-values i {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    color: #667eea;
+    transition: color 0.3s ease;
+}
+.about-values li:hover i { color: #fff; }
+.about-values strong {
+    display: block;
+    font-size: 1.15rem;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+/* ---------------- Team Section ---------------- */
+.about-team { max-width: 1200px; margin: 100px auto; padding: 0 20px; }
+.about-team .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+    gap: 30px;
+}
+.team-member {
+    background: #fff;
+    border-radius: 24px;
+    padding: 35px 20px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.4s ease;
+}
+.team-member:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
+.team-member img {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    border: 5px solid #f7f8fc;
+    margin-bottom: 12px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.team-member:hover img { transform: scale(1.1) rotate(2deg); }
+.team-member h4 { color: #5562ea; margin-bottom: 5px; font-size: 1.2rem; font-weight: 600; }
+.team-member p { font-size: 0.95rem; color: #555; }
+
+/* ---------------- Footer ---------------- */
+.main-footer {
+    background: #222;
+    color: #fff;
+    text-align: center;
+    padding: 30px 0;
+    font-size: 0.9rem;
+}
+
+/* ---------------- Responsive ---------------- */
+@media(max-width: 768px){
+    .about-mission-vision, .about-values ul, .team-grid { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="navbar">
+<div class="container nav-container">
+<div class="logo"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="AI-Solutions Logo" style="width:35px;"></div>
+<nav id="nav-menu">
+<ul class="nav-links">
+<li><a href="{{ url_for('landing') }}">Home</a></li>
+<li><a href="{{ url_for('about') }}" class="active">About Us</a></li>
+<li><a href="{{ url_for('solutions') }}">Solutions</a></li>
+<li><a href="{{ url_for('services') }}">Services</a></li>
+<li><a href="{{ url_for('case_studies') }}">Case Studies</a></li>
+<li><a href="{{ url_for('articles') }}">Articles</a></li>
+<li><a href="{{ url_for('events') }}">Events</a></li>
+<li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+<li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+<li><a href="{{ url_for('contact') }}">Contact</a></li>
+</ul>
+<div class="hamburger" onclick="toggleMenu()">☰</div>
+</nav>
+</div>
+</header>
+
+<!-- Hero -->
+<section class="about-hero">
+<div class="container">
+<h1>About AI-Solutions</h1>
+<p>Empowering businesses with AI-driven solutions to enhance operations, maximize efficiency, and achieve measurable growth.</p>
+</div>
+</section>
+
+<!-- Mission & Vision Cards -->
+<section class="about-mission-vision">
+<div class="mission-card">
+<i class="fa-solid fa-bullseye"></i>
+<h3>Our Mission</h3>
+<p>To deliver cutting-edge AI solutions that optimize business processes, empower employees, and drive innovation across industries.</p>
+</div>
+<div class="vision-card">
+<i class="fa-solid fa-eye"></i>
+<h3>Our Vision</h3>
+<p>To become the leading AI partner globally, recognized for innovation, excellence, and the measurable impact of our solutions.</p>
+</div>
+</section>
+
+<!-- Core Values -->
+<section class="about-values">
+<div class="container">
+<h2>Our Core Values</h2>
+<ul>
+<li><i class="fa-solid fa-lightbulb"></i><strong>Innovation</strong><p>Exploring new AI technologies to create unique solutions.</p></li>
+<li><i class="fa-solid fa-scale-balanced"></i><strong>Integrity</strong><p>Transparent, ethical, and accountable in every project.</p></li>
+<li><i class="fa-solid fa-handshake"></i><strong>Collaboration</strong><p>Partnering closely with clients for shared success.</p></li>
+<li><i class="fa-solid fa-star"></i><strong>Excellence</strong><p>Delivering reliable, high-quality, and efficient solutions.</p></li>
+<li><i class="fa-solid fa-users"></i><strong>Customer-Centric</strong><p>Prioritizing client needs and satisfaction in every decision.</p></li>
+</ul>
+</div>
+</section>
+
+<!-- Team -->
+<section class="about-team">
+<div class="container">
+<h2>Meet Our Team</h2>
+<div class="team-grid">
+<div class="team-member">
+<h4>Safalta Bhujel</h4>
+<p>Lead Developer & Project Manager</p>
+</div>
+<div class="team-member">
+<h4>Jane Doe</h4>
+<p>AI Specialist</p>
+</div>
+<div class="team-member">
+<h4>John Smith</h4>
+<p>UI/UX Designer</p>
+</div>
+<div class="team-member">
+<h4>Emma Johnson</h4>
+<p>Data Analyst</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="main-footer">
+<p>© 2025 AI-Solutions | All Rights Reserved</p>
+</footer>
+
+<script>
+function toggleMenu(){ 
+    document.getElementById('nav-menu').classList.toggle('active'); 
+}
+</script>
+
+</body>
+</html>

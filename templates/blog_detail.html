@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ blog.title }} | AI-Solutions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .blog-hero {
+            background: linear-gradient(135deg, #ff6ec7, #6ec1ff);
+            padding: 100px 20px;
+            text-align: center;
+            color: #fff;
+            clip-path: polygon(0 0, 100% 0, 100% 80%, 0 100%);
+        }
+        .blog-hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+        .blog-hero p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+        .blog-content {
+            max-width: 900px;
+            margin: -50px auto 80px auto;
+            background: #fff;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 10;
+        }
+        .blog-content img {
+            width: 100%;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .blog-content h2 {
+            color: #ff6ec7;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .blog-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ff6ec7, #6ec1ff);
+            color: #fff;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .back-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255,110,199,0.3);
+        }
+        @media screen and (max-width: 768px) {
+            .blog-hero h1 {
+                font-size: 2.2rem;
+            }
+            .blog-hero p {
+                font-size: 1rem;
+            }
+            .blog-content {
+                padding: 35px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="AI-Solutions Logo" style="width: 35px;">
+            </div>
+            <nav id="nav-menu">
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('landing') }}">Home</a></li>
+                    <li><a href="{{ url_for('about') }}">About Us</a></li>
+                    <li><a href="{{ url_for('solutions') }}">Solutions</a></li>
+                    <li><a href="{{ url_for('blogs') }}" class="active">Blogs</a></li>
+                    <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">☰</div>
+        </div>
+    </header>
+
+    <!-- Blog Hero Section -->
+    <section class="blog-hero">
+        <h1>{{ blog.title }}</h1>
+        <p>Published on {{ blog.date if blog.date else "Unknown Date" }}</p>
+    </section>
+
+    <!-- Blog Content -->
+    <div class="blog-content">
+        {% if blog.image %}
+            <img src="{{ url_for('static', filename='images/' ~ blog.image) }}" alt="{{ blog.title }}">
+        {% endif %}
+        <h2>{{ blog.subtitle if blog.subtitle else "" }}</h2>
+        <p>{{ blog.content }}</p>
+
+        <a href="{{ url_for('blogs') }}" class="back-btn">← Back to Blogs</a>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p>© 2025 AI-Solutions | All Rights Reserved</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navMenu = document.getElementById('nav-menu');
+            navMenu.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>

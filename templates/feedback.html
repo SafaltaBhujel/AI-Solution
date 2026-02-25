@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback | AI-Solutions</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+body { font-family: 'Inter', sans-serif; margin:0; padding:0; background:#f5f7fa; color:#333; }
+.container { width:90%; max-width:1200px; margin:0 auto; }
+
+/* Navbar */
+.navbar { background:#fff; padding:15px 0; box-shadow:0 2px 6px rgba(0,0,0,0.08); position:sticky; top:0; z-index:999; }
+.nav-links { list-style:none; display:flex; gap:20px; flex-wrap:wrap; }
+.nav-links li a { text-decoration:none; color:#333; font-weight:500; transition:0.3s; }
+.nav-links li a.active, .nav-links li a:hover { color:#1976d2; }
+.hamburger { display:none; cursor:pointer; font-size:1.8rem; }
+@media(max-width:768px){.nav-links{display:none; flex-direction:column; gap:10px; margin-top:10px;}.nav-links.active{display:flex;}.hamburger{display:block;}}
+
+/* Hero Section */
+.feedback-hero { text-align:center; padding:100px 20px 80px; background:linear-gradient(135deg, #ff9a8b 0%, #30e3ca 100%); color:#fff; position:relative; overflow:hidden; }
+.feedback-hero::before { content:''; position:absolute; width:300px; height:300px; background:rgba(255,255,255,0.15); border-radius:50%; top:-50px; left:-50px; transform:rotate(45deg); }
+.feedback-hero::after { content:''; position:absolute; width:200px; height:200px; background:rgba(255,255,255,0.1); border-radius:50%; bottom:-40px; right:-30px; transform:rotate(30deg); }
+.feedback-hero h1 { font-size:3rem; font-weight:700; margin-bottom:15px; z-index:1; position:relative; }
+.feedback-hero p { font-size:1.2rem; max-width:700px; margin:0 auto; font-weight:400; z-index:1; position:relative; }
+
+/* Feedback Card */
+.feedback-section { padding:60px 0; display:flex; justify-content:center; align-items:center; min-height:70vh; background-color: #e3f5ff; }
+.feedback-card { width:90%; max-width:550px; background:#fff; padding:40px; border-radius:20px; box-shadow:0 15px 40px rgba(0,0,0,0.12); text-align:center; transition:transform 0.3s, box-shadow 0.3s; border: 1px solid #eee; }
+.feedback-card:hover { transform:translateY(-5px); box-shadow:0 25px 50px rgba(0,0,0,0.18); }
+.feedback-card h2 { font-size:2rem; font-weight:700; margin-bottom:20px; color:#111; }
+
+/* Inputs */
+.feedback-card input, .feedback-card textarea { width:100%; padding:15px; margin-bottom:15px; border-radius:12px; border:1px solid #ddd; font-size:1rem; transition:0.25s; }
+.feedback-card input:focus, .feedback-card textarea:focus { border-color:#30e3ca; box-shadow:0 0 0 3px rgba(48, 227, 202, 0.2); outline:none; }
+
+/* Rating Stars */
+.rating-stars { font-size:2rem; display:flex; justify-content:center; gap:15px; margin-bottom:20px; }
+.rating-stars .fa-star { color:#b0b0b0; cursor:pointer; transition:transform 0.2s, color 0.2s; }
+.rating-stars .fa-star.filled { color:#FFD700; }
+.rating-stars .fa-star:hover { transform:scale(1.1); }
+
+/* Submit Button */
+.feedback-button { width:100%; background-color:#FFC107; color:#333; padding:16px; border:none; border-radius:12px; font-size:1.1rem; font-weight:700; cursor:pointer; box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4); transition:background-color 0.3s, transform 0.2s, box-shadow 0.3s; }
+.feedback-button:hover { background-color:#FFB300; transform:translateY(-2px); box-shadow:0 8px 15px rgba(255, 179, 0, 0.6); }
+
+/* Success Message */
+.success { max-width:550px; margin:20px auto; background:#e0f7f6; color:#00897b; border-left:5px solid #00897b; padding:16px 20px; border-radius:12px; font-size:1rem; font-weight:500; display:flex; align-items:center; gap:12px; box-shadow:0 8px 20px rgba(0,0,0,0.08); animation:fadeIn 0.5s ease-in-out; }
+.success i { font-size:1.3rem; }
+
+/* Footer */
+.main-footer { background:#111; color:#bbb; text-align:center; padding:25px 0; font-size:0.9rem; }
+
+/* Animations */
+@keyframes fadeIn { 0% { opacity:0; transform:translateY(-10px); } 100% { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="container nav-container">
+    <div class="logo"><img src="{{ url_for('static', filename='images/logo.png') }}" alt="AI-Solutions Logo" style="width:39px;"></div>
+    <nav id="nav-menu">
+      <ul class="nav-links">
+        <li><a href="{{ url_for('landing') }}">Home</a></li>
+        <li><a href="{{ url_for('about') }}">About Us</a></li>
+        <li><a href="{{ url_for('solutions') }}">Solutions</a></li>
+        <li><a href="{{ url_for('services') }}">Services</a></li>
+        <li><a href="{{ url_for('case_studies') }}">Case Studies</a></li>
+        <li><a href="{{ url_for('articles') }}">Articles</a></li>
+        <li><a href="{{ url_for('events') }}">Events</a></li>
+        <li><a href="{{ url_for('gallery') }}">Gallery</a></li>
+        <li><a href="{{ url_for('feedback') }}" class="active">Feedback</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+      <div class="hamburger" onclick="toggleMenu()">☰</div>
+    </nav>
+  </div>
+</header>
+
+<section class="feedback-hero">
+  <div class="container">
+    <h1>We Value Your Feedback</h1>
+    <p>Your thoughts help us improve our services and deliver better experiences.</p>
+  </div>
+</section>
+
+<section class="feedback-section">
+  <div class="feedback-card">
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="success"><i class="fa-solid fa-circle-check"></i><span>{{ messages[0] }}</span></div>
+      {% endif %}
+    {% endwith %}
+    <h2>Share Your Opinion</h2>
+    <form method="POST" action="{{ url_for('feedback') }}">
+      <input type="text" name="name" placeholder="Your Name" required>
+      <input type="email" name="email" placeholder="Your Email" required>
+      <p>How would you rate your experience?</p>
+      <div class="rating-stars">
+        <i class="far fa-star" data-rating="1"></i>
+        <i class="far fa-star" data-rating="2"></i>
+        <i class="far fa-star" data-rating="3"></i>
+        <i class="far fa-star" data-rating="4"></i>
+        <i class="far fa-star" data-rating="5"></i>
+      </div>
+      <input type="hidden" name="rating" id="rating-value" value="0">
+      <textarea name="message" class="feedback-message" placeholder="Type your feedback here..." required></textarea>
+      <button type="submit" class="feedback-button">Submit Feedback</button>
+    </form>
+  </div>
+</section>
+
+<footer class="main-footer">
+  <p>© 2025 AI-Solutions | All Rights Reserved</p>
+</footer>
+
+<script>
+function toggleMenu(){ document.querySelector(".nav-links").classList.toggle("active"); }
+
+// Star rating
+const stars = document.querySelectorAll('.rating-stars .fa-star');
+const ratingInput = document.getElementById('rating-value');
+let selectedRating = 0;
+
+stars.forEach(star => {
+    star.addEventListener('click', () => {
+        selectedRating = parseInt(star.getAttribute('data-rating'));
+        ratingInput.value = selectedRating;
+        applyStarColor(selectedRating);
+    });
+    star.addEventListener('mouseover', () => {
+        applyStarColor(parseInt(star.getAttribute('data-rating')));
+    });
+    star.addEventListener('mouseout', () => {
+        applyStarColor(selectedRating);
+    });
+});
+
+function applyStarColor(rating){
+    stars.forEach(s => {
+        if(parseInt(s.getAttribute('data-rating')) <= rating){
+            s.classList.add('filled'); s.classList.remove('far'); s.classList.add('fas');
+        } else {
+            s.classList.remove('filled'); s.classList.add('far'); s.classList.remove('fas');
+        }
+    });
+}
+</script>
+
+</body>
+</html>

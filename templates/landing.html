@@ -3,276 +3,372 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to SecureApp</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-    rel="stylesheet"
-  />
-  <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(to right, #fce4ec, #f8bbd0);
-      color: #3c1e2f;
-      line-height: 1.6;
-    }
-
-    header {
-      position: sticky;
-      top: 0;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-      z-index: 1000;
-    }
-
-    .logo {
-      font-weight: 800;
-      font-size: 2rem;
-      color: #e91e63;
-      letter-spacing: 1px;
-    }
-
-    nav {
-      display: flex;
-      gap: 1.5rem;
-    }
-
-    nav a {
-      text-decoration: none;
-      color: #3c1e2f;
-      font-weight: 600;
-      padding: 0.5rem 1rem;
-      border-radius: 24px;
-      transition: background 0.3s, color 0.3s;
-    }
-
-    nav a:hover {
-      background-color: #ec407a;
-      color: #fff;
-    }
-
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-    }
-
-    .hamburger div {
-      width: 25px;
-      height: 3px;
-      background: #3c1e2f;
-      border-radius: 3px;
-    }
-
-    .hero-section {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 90vh;
-      text-align: center;
-      color: white;
-      overflow: hidden;
-    }
-
-    .hero-section img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 1;
-      filter: brightness(0.6);
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 720px;
-      padding: 3rem 2.5rem;
-      animation: fadeInUp 1s ease-in-out forwards;
-      color: #fff;
-      text-align: center;
-      line-height: 1.5;
-      font-weight: 600;
-    }
-
-    .hero-text-bg {
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.55);
-      border-radius: 12px;
-      filter: blur(6px);
-      z-index: -1;
-    }
-
-    .hero-content h1 {
-      font-size: 3.5rem;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 10px rgba(0,0,0,0.7);
-      line-height: 1.1;
-    }
-
-    .hero-content p {
-      font-size: 1.4rem;
-      margin-bottom: 2rem;
-      text-shadow: 0 0 8px rgba(0,0,0,0.6);
-      font-weight: 500;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    /* Shiny buttons */
-    .btn {
-      text-decoration: none;
-      background: linear-gradient(135deg, #ec407a, #d81b60);
-      color: white;
-      padding: 0.75rem 2.2rem;
-      border-radius: 30px;
-      font-weight: 700;
-      box-shadow: 0 0 10px rgba(236, 64, 122, 0.75);
-      transition: background 0.4s ease, box-shadow 0.6s ease, transform 0.3s ease;
-    }
-
-    .btn:hover {
-      background: linear-gradient(135deg, #ff4081, #d81b60);
-      box-shadow: 0 0 25px 8px rgba(255, 64, 129, 1);
-      transform: scale(1.05);
-    }
-
-    section#about {
-      max-width: 850px;
-      margin: 5rem auto;
-      padding: 2.5rem;
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-      text-align: center;
-    }
-
-    section#about h2 {
-      font-size: 2.2rem;
-      margin-bottom: 1.2rem;
-    }
-
-    section#about p {
-      font-size: 1.15rem;
-      color: #5d3c4c;
-    }
-
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      font-size: 0.9rem;
-      background: #fce4ec;
-      color: #7c4d58;
-    }
-
-    @keyframes fadeInUp {
-      0% {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    @media (max-width: 768px) {
-      nav {
-        display: none;
-        position: fixed;
-        top: 70px;
-        right: 0;
-        background: #fff0f5;
-        width: 220px;
-        height: 100vh;
-        flex-direction: column;
-        padding: 2rem;
-        box-shadow: -2px 0 12px rgba(0,0,0,0.1);
-        z-index: 999;
-      }
-      nav.active {
-        display: flex;
-      }
-      .hamburger {
-        display: flex;
-      }
-    }
-  </style>
+  <title>AI-Solutions | Digital Employee Experience</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-  <header>
-    <div class="logo">SecureApp</div>
-    <nav id="nav-menu">
-      <a href="#home">Home</a>
-      <a href="#about">About Us</a>
-      <a href="{{ url_for('login') }}">Log In</a>
-      <a href="{{ url_for('register') }}">Register</a>
-    </nav>
-    <div class="hamburger" id="hamburger">
-      <div></div>
-      <div></div>
-      <div></div>
-    </div>
-  </header>
 
-  <main class="hero-section" id="home">
-    <img
-      src="https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=1280&q=80"
-      alt="Modern workspace with security elements"
-    />
-    <div class="hero-content">
-      <div class="hero-text-bg"></div>
-      <h1>Welcome to SecureApp</h1>
-      <p>
-        Your secure and modern authentication system with Two-Factor Authentication and strong password protection.
-        Get started by logging in or creating a new account.
-      </p>
-      <div class="btn-group">
-        <a class="btn" href="{{ url_for('login') }}">Log In</a>
-        <a class="btn" href="{{ url_for('register') }}">Register</a>
+<!-- Top Bar -->
+<div class="top-bar">
+  <div class="container top-bar-container">
+    <p>Need help to start your project? <a href="{{ url_for('contact') }}">Request a Call!</a></p>
+    <div class="social-links">
+      <span>Follow us:</span>
+      <a href="#"><i class="fab fa-facebook"></i></a>
+      <a href="#"><i class="fab fa-instagram"></i></a>
+      <a href="#"><i class="fab fa-linkedin"></i></a>
+      <a href="#"><i class="fab fa-twitter"></i></a>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<header class="navbar">
+  <div class="container nav-container">
+    <div class="logo">
+      
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="AI-Solutions Logo" style="width:35px;">
+
+</div> 
+<nav id="nav-menu"> 
+  <ul class="nav-links"> 
+    <li><a href="{{ url_for('landing') }}" class="active">Home</a></li> 
+    <li><a href="{{ url_for('about') }}">About Us</a></li> 
+    <li><a href="{{ url_for('solutions') }}">Solutions</a></li> 
+    <li><a href="{{ url_for('services') }}">Services</a></li> 
+    <li><a href="{{ url_for('case_studies') }}">Case Studies</a></li> 
+    <li><a href="{{ url_for('articles') }}">Articles</a></li> 
+    <li><a href="{{ url_for('events') }}">Events</a></li> 
+    <li><a href="{{ url_for('gallery') }}">Gallery</a></li> 
+    <li><a href="{{ url_for('feedback') }}">Feedback</a></li> 
+    <li><a href="{{ url_for('contact') }}">Contact</a></li> 
+  </ul> 
+  <div class="hamburger" onclick="toggleMenu()">☰</div> 
+</nav> 
+</div> 
+<nav id="nav-menu"> 
+  <ul class="nav-links"> 
+    <!-- your nav items --> 
+  </ul> 
+  <div class="hamburger" onclick="toggleMenu()">☰</div> 
+</nav>
+
+<!-- Add auth buttons here -->
+<ul class="auth-nav">
+  {% if 'admin' in session %}
+    <li><a href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+  {% else %}
+  {% endif %}
+</ul>
+
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+  <div class="container hero-container">
+    <div class="hero-text">
+      <h1>Innovating the <span class="highlight">Future of Work with AI</span></h1>
+      <p>We deliver AI-driven virtual assistants, smart prototyping solutions, and intelligent tools to empower industries worldwide. Transform workflows, improve efficiency, and gain actionable insights.</p>
+      <div class="hero-buttons">
+        <a href="{{ url_for('solutions') }}" class="btn start-trial">Explore Our Solutions →</a>
+        <a href="{{ url_for('contact') }}" class="btn secondary-btn">Book a Free Demo</a>
       </div>
     </div>
-  </main>
+    <div class="hero-image">
 
-  <section id="about">
-    <h2>About SecureApp</h2>
-    <p>
-      SecureApp provides enterprise-grade authentication solutions, combining Two-Factor Authentication, reCAPTCHA protection, strong password enforcement, and session hardening. Designed with both security and usability in mind, our platform ensures seamless, responsive access across all devices meeting the highest standards of modern web security.
-    </p>
+      <img src="{{ url_for('static', filename='images/ai_hero.png') }}" alt="AI Transformation Illustration">
+    </div>
+  </div>
+</section>
+
+
+<!-- Features -->
+<section class="features">
+  <div class="container">
+    <h2>Why Choose AI-Solutions?</h2>
+    <div class="features-list">
+      <div class="feature-item">
+        <i class="fas fa-bolt"></i>
+        <h4>Fast Deployment</h4>
+        <p>Integrate AI tools quickly into your workflows with no downtime.</p>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-cogs"></i>
+        <h4>Customizable</h4>
+        <p>Tailored solutions designed to fit your business needs.</p>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-users"></i>
+        <h4>User-Friendly</h4>
+        <p>Intuitive dashboards for smooth interactions and decisions.</p>
+      </div>
+      <div class="feature-item">
+        <i class="fas fa-lightbulb"></i>
+        <h4>Innovative</h4>
+        <p>Stay ahead with modern, cutting-edge AI technologies.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Trusted By -->
+<section class="trusted-by">
+  <div class="container">
+    <p class="trusted-text">Trusted by <span>10,000+</span> businesses worldwide.</p>
+    <div class="logo-row">
+  <img src="{{ url_for('static', filename='images/logo1.png') }}" alt="Logo 1" style="width:100px; height:auto; margin:0 10px;">
+<img src="{{ url_for('static', filename='images/logo2.png') }}" alt="Logo 2" style="width:100px; height:auto; margin:0 10px;">
+<img src="{{ url_for('static', filename='images/logo3.png') }}" alt="Logo 3" style="width:100px; height:auto; margin:0 10px;">
+<img src="{{ url_for('static', filename='images/logo4.png') }}" alt="Logo 4" style="width:100px; height:auto; margin:0 10px;">
+
+
+  </div>
+</section>
+
+
+<!-- About / Stats -->
+<section class="ideas-into-tech-section">
+  <div class="container">
+    <div class="content-wrapper">
+      <div class="text-content">
+        <p class="subtitle">Know About Us</p>
+        <h2 class="main-title">Transforming Ideas Into Technology</h2>
+        <p>We provide packages for any business size or budget because we are aware that every business has unique needs.</p>
+        <p>Every implementation with AI-Solutions includes a detailed design phase, integration, and support to ensure long-term success.</p>
+        <a href="{{ url_for('about') }}" class="learn-more">Learn More →</a>
+      </div>
+      <div class="stats-content">
+        <div class="stat-item">
+          <h3 class="stat-number">20K+</h3>
+          <p class="stat-description">Trusted worldwide</p>
+        </div>
+        <div class="stat-item">
+          <h3 class="stat-number">15+</h3>
+          <p class="stat-description">Years of industry expertise</p>
+        </div>
+        <div class="stat-item">
+          <h3 class="stat-number">300+</h3>
+          <p class="stat-description">Projects completed successfully</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Solutions -->
+<section class="solutions" id="solutions">
+  <div class="container">
+    <h2>Our Solutions</h2>
+    <div class="solution-cards">
+      <div class="card">
+        <h3>Enterprise AI Packages</h3>
+        <p>Comprehensive AI solutions designed for your business needs, including automation, analytics, and virtual assistants.</p>
+      </div>
+      <div class="card">
+        <h3>Custom AI Tools</h3>
+        <p>Tailored AI applications and intelligent workflows for specific industry challenges.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Services -->
+<section class="services" id="services">
+  <div class="container">
+    <h2>Our Services</h2>
+    <div class="service-cards">
+      <div class="card">
+        <i class="fas fa-robot fa-3x"></i>
+        <h3>Virtual Assistants</h3>
+        <p>24/7 AI-powered support for employees and customers.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-flask fa-3x"></i>
+        <h3>Prototyping</h3>
+        <p>Rapid AI-driven prototyping tailored for diverse industries.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-chart-line fa-3x"></i>
+        <h3>Analytics & Dashboards</h3>
+        <p>Actionable insights with data-driven dashboards.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Articles Section -->
+<section class="blogs" id="articles">
+  <div class="container">
+    <h2>Latest Articles</h2>
+    <p class="subheading">Explore our insights, case studies, and innovative solutions powered by AI.</p>
+
+    <div class="blog-cards">
+      <div class="blog-card">
+        <div class="blog-image">
+          <img src="{{ url_for('static', filename='images/blog1.png') }}" alt="Blog 1">
+        </div>
+        <div class="blog-content">
+          <h3>AI in HR – Transforming Employee Experience</h3>
+          <p>Learn how AI solutions streamline HR processes, enhance employee engagement, and save time across organizations.</p>
+          <a href="{{ url_for('articles') }}" class="read-more">Read More →</a>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <div class="blog-image">
+          <img src="{{ url_for('static', filename='images/blog2.png') }}" alt="Blog 2">
+        </div>
+        <div class="blog-content">
+          <h3>Prototyping Smarter with AI Tools</h3>
+          <p>Discover how AI-driven prototyping improves design speed and accuracy, helping businesses innovate faster.</p>
+          <a href="{{ url_for('articles') }}" class="read-more">Read More →</a>
+        </div>
+      </div>
+
+      <div class="blog-card">
+        <div class="blog-image">
+          <img src="{{ url_for('static', filename='images/blog3.png') }}" alt="Blog 3">
+        </div>
+        <div class="blog-content">
+          <h3>AI Analytics in Modern Enterprises</h3>
+          <p>Explore how AI analytics empowers data-driven decision-making across diverse industries, optimizing workflows.</p>
+          <a href="{{ url_for('articles') }}" class="read-more">Read More →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Feedback / Testimonials -->
+<section class="feedback" id="feedback">
+  <div class="container">
+    <h2>What Our Clients Say</h2>
+    <div class="feedback-cards">
+      <div class="feedback-card">
+        <p>"AI-Solutions transformed our operations with custom AI workflows. Productivity improved by 40%!"</p>
+        <h4>- John D., TechCorp</h4>
+      </div>
+      <div class="feedback-card">
+        <p>"Their AI-driven analytics dashboard gave us real-time insights and saved hours of manual work."</p>
+        <h4>- Sarah L., EduGlobal</h4>
+      </div>
+      <div class="feedback-card">
+        <p>"From consultation to deployment, their support was excellent. We now run smarter with AI."</p>
+        <h4>- Mark S., HealthPlus</h4>
+      </div>
+      <div class="feedback-card">
+        <p>"The AI chatbot integrated seamlessly with our system, handling 70% of queries automatically."</p>
+        <h4>- Priya K., eCommerceX</h4>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Upcoming Events -->
+<section class="events" id="events">
+  <div class="container">
+    <h2>Upcoming Events</h2>
+    <div class="event-card">
+      <div class="event-date">
+        <span class="day">15</span>
+        <span class="month">Nov</span>
+        <span class="year">2025</span>
+      </div>
+      <div class="event-info">
+        <h3>AI Innovation Summit</h3>
+        <p><i class="fas fa-map-marker-alt"></i> London, UK</p>
+        <a href="#" class="btn-register">Reserve Your Spot</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- Service Areas -->
+<section class="service-areas">
+  <div class="container">
+    <p class="subtitle">Our Service Areas</p>
+    <h2 class="main-title">Empowering Your Digital Future</h2>
+    <div class="icon-row">
+      <div class="icon"><i class="fas fa-heartbeat"></i><span>Healthcare & Biotech</span></div>
+      <div class="icon"><i class="fas fa-film"></i><span>Media & Entertainment</span></div>
+      <div class="icon"><i class="fas fa-graduation-cap"></i><span>EdTech & eLearning</span></div>
+      <div class="icon"><i class="fas fa-shopping-cart"></i><span>Ecommerce & Supply</span></div>
+    </div>
+  </div>
+</section>
+  <!-- Case Studies -->
+  <section class="case-studies">
+    <div class="container">
+      <h2 class="section-title">Case Studies</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>AI in HR Transformation</h3>
+          <p>Learn how we integrated AI tools into HR systems to streamline employee experiences.</p>
+          <a href="/case-studies" class="btn-sm">Read More</a>
+        </div>
+        <div class="card">
+          <h3>Smart Prototyping with AI</h3>
+          <p>Discover how AI-powered prototyping improved design speed by 40% for our clients.</p>
+          <a href="/case-studies" class="btn-sm">Read More</a>
+        </div>
+        <div class="card">
+          <h3>Cloud Migration Success</h3>
+          <p>A financial services firm successfully migrated to the cloud with zero downtime.</p>
+          <a href="/case-studies" class="btn-sm">Read More</a>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <footer>
-    &copy; 2025 SecureApp. All rights reserved.
-  </footer>
 
-  <script>
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
 
-    hamburger.addEventListener('click', () => {
-      navMenu.classList.toggle('active');
-    });
-  </script>
+<!-- Gallery -->
+<section class="gallery" id="gallery">
+  <div class="container">
+    <h2>Gallery</h2>
+    <div class="gallery-images">
+      <img src="{{ url_for('static', filename='images/event1.png') }}" alt="Gallery Image 1">
+      <img src="{{ url_for('static', filename='images/event2.png') }}" alt="Gallery Image 2">
+      <img src="{{ url_for('static', filename='images/event3.png') }}" alt="Gallery Image 2">
+
+    </div>
+  </div>
+</section>
+
+
+<!-- Newsletter -->
+<section class="newsletter">
+  <div class="container">
+    <h2>Subscribe & Get Weekly Updates</h2>
+    <div class="email-input">
+      <input type="email" placeholder="Enter your email" required>
+      <button type="submit">→</button>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="main-footer">
+  <div class="container footer-container">
+    <p>Contact: info@ai-solutions.com | +977-980XXXXXXX | Kathmandu, Nepal</p>
+    <p>© {{ current_year }} AI-Solutions | Academic Project</p>
+  </div>
+</footer>
+
+<script>
+function toggleMenu() {
+  document.getElementById('nav-menu').classList.toggle('active');
+}
+</script>
+
+
 </body>
 </html>
