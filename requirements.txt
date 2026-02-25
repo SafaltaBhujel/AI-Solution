@@ -19,6 +19,7 @@ flask-talisman==1.1.0
 Flask-WTF==1.2.2
 git-filter-repo==2.47.0
 greenlet==3.2.4
+gunicorn==25.1.0
 idna==3.10
 itsdangerous==2.2.0
 Jinja2==3.1.6
@@ -45,4 +46,3 @@ URLObject==2.4.3
 Werkzeug==2.3.6
 wrapt==1.17.2
 WTForms==3.2.1
-gunicorn
