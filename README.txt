@@ -3,6 +3,7 @@ A Production-Ready Secure Authentication System
 AI-SecureAuth is a robust user registration and login system built with Python (Flask). Designed for modern web security standards, it features a custom Baby Pink & White UI, Multi-Factor Authentication (MFA), and automated account protection. This project demonstrates a full development lifecycle—from secure coding to cloud optimization on Render.
 
 🚀 Live Demo
+To view the app click here
 https://ai-solution-web.onrender.com/
 
 ✨ Product Highlights
